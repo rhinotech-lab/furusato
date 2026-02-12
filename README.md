@@ -172,3 +172,4 @@ npm run dev
 
 詳細な開発ガイドについては、[DEVELOPMENT.md](./DEVELOPMENT.md) を参照してください。
 # furusato
+# furusato
