@@ -1,7 +1,7 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User } from '../types';
-import { ADMIN_USERS, MUNICIPALITY_USERS, BUSINESS_USERS } from '../services/mockDb';
+import { authApi } from '../services/api';
 
 export type SendMode = 'enter' | 'ctrl_enter';
 
@@ -21,16 +21,18 @@ interface AuthContextType {
   currentUser: User | null;
   appSettings: AppSettings;
   currentFiscalYear: number;
-  login: (userId: number, type: 'admin' | 'municipality' | 'business') => void;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   updateSettings: (settings: Partial<AppSettings>) => void;
   setFiscalYear: (year: number) => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentFiscalYear, setCurrentFiscalYear] = useState<number>(2025);
   const [appSettings, setAppSettings] = useState<AppSettings>({
     sendMode: 'enter',
@@ -48,23 +50,60 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     ]
   });
 
-  const login = (userId: number, type: 'admin' | 'municipality' | 'business') => {
-    let user: User | undefined;
-    if (type === 'admin') {
-      user = ADMIN_USERS.find(u => u.id === userId);
-    } else if (type === 'municipality') {
-      user = MUNICIPALITY_USERS.find(u => u.id === userId);
-    } else {
-      user = BUSINESS_USERS.find(u => u.id === userId);
-    }
-    
-    if (user) {
-      setCurrentUser(user);
+  // 初期化時にユーザー情報を取得
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const response = await authApi.me();
+        if (response.user) {
+          setCurrentUser({
+            id: response.user.id,
+            name: response.user.name,
+            email: response.user.email,
+            role: response.user.type === 'admin' ? 'super_admin' : 
+                  response.user.type === 'municipality' ? 'municipality_user' : 'business_user',
+            municipality_id: response.user.municipality_id ?? undefined,
+            business_id: response.user.business_id ?? undefined,
+          });
+        }
+      } catch (error) {
+        // トークンが無効または未認証
+        console.log('未認証状態');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await authApi.login(email, password);
+      if (response.user) {
+        setCurrentUser({
+          id: response.user.id,
+          name: response.user.name,
+          email: response.user.email,
+          role: response.user.type === 'admin' ? 'super_admin' : 
+                response.user.type === 'municipality' ? 'municipality_user' : 'business_user',
+          municipality_id: response.user.municipality_id ?? undefined,
+          business_id: response.user.business_id ?? undefined,
+        });
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
-  const logout = () => {
-    setCurrentUser(null);
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch (error) {
+      console.error('ログアウトエラー:', error);
+    } finally {
+      setCurrentUser(null);
+    }
   };
 
   const updateSettings = (newSettings: Partial<AppSettings>) => {
@@ -76,7 +115,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, appSettings, currentFiscalYear, login, logout, updateSettings, setFiscalYear }}>
+    <AuthContext.Provider value={{ currentUser, appSettings, currentFiscalYear, login, logout, updateSettings, setFiscalYear, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,88 @@
 services:
-  web:
-    build: .
+  # MySQL データベース
+  mysql:
+    image: mysql:8.0
+    container_name: furusato_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: furusato_db
+      MYSQL_USER: furusato_user
+      MYSQL_PASSWORD: furusato_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - furusato_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel バックエンド
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: furusato_backend
+    volumes:
+      - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+    ports:
+      - "8000:9000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: furusato_db
+      DB_USERNAME: furusato_user
+      DB_PASSWORD: furusato_password
+      APP_ENV: local
+      APP_DEBUG: true
+    networks:
+      - furusato_network
+    command: php-fpm
+
+  # Nginx (Laravel用)
+  nginx:
+    image: nginx:alpine
+    container_name: furusato_nginx
     ports:
       - "8080:80"
+    volumes:
+      - ./backend/public:/var/www/html/public:ro
+      - ./nginx-backend.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - furusato_network
+
+  # React フロントエンド
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: furusato_frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+    networks:
+      - furusato_network
+    depends_on:
+      - nginx
+
+volumes:
+  mysql_data:
+  backend_vendor:
+
+networks:
+  furusato_network:
+    driver: bridge
