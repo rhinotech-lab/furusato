@@ -23,4 +23,5 @@ ENV PORT 8080
 EXPOSE 8080
 
 # 起動時に envsubst で $PORT を nginx.conf に反映してから起動
-CMD ["sh", "-c", "envsubst '\$PORT' < /etc/nginx/conf.d/default.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD sh -c "envsubst '\$PORT' < /etc/nginx/conf.d/default.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+
