@@ -77,20 +77,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (userId: string, password: string) => {
     try {
-      const response = await authApi.login(email, password);
-      if (response.user) {
-        setCurrentUser({
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-          role: response.user.type === 'admin' ? 'super_admin' : 
-                response.user.type === 'municipality' ? 'municipality_user' : 'business_user',
-          municipality_id: response.user.municipality_id ?? undefined,
-          business_id: response.user.business_id ?? undefined,
-        });
+      // IDとパスワードで認証（開発用：本番ではAPIを使用）
+      const { authenticateUser } = await import('../services/mockDb');
+      const id = parseInt(userId);
+      const user = authenticateUser(id, password);
+      
+      if (!user) {
+        throw new Error('IDまたはパスワードが正しくありません');
       }
+
+      // ユーザー情報を設定
+      setCurrentUser({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        municipality_id: user.municipality_id ?? undefined,
+        business_id: user.business_id ?? undefined,
+      });
+
+      // トークンを設定（開発用：実際のAPIではトークンを受け取る）
+      localStorage.setItem('auth_token', `mock_token_${user.id}`);
     } catch (error) {
       throw error;
     }

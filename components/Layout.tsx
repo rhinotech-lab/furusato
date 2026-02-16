@@ -14,7 +14,7 @@ import {
   User as UserIcon,
   Image as ImageIcon,
   BarChart3,
-  FolderKanban,
+
   History,
   ChevronLeft,
   ChevronRight
@@ -73,7 +73,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { label: '通知履歴', path: `${basePath}/notifications`, icon: <Bell size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: unreadCount > 0 ? unreadCount : null, badgeColor: 'bg-red-500' },
     { label: '自治体一覧', path: '/admin/municipalities', icon: <Building2 size={18} />, roles: ['super_admin', 'creator'], badge: null },
     { label: '事業者一覧', path: `${basePath}/businesses`, icon: <Store size={18} />, roles: ['super_admin', 'municipality_user', 'creator'], badge: null },
-    { label: 'プロジェクト一覧', path: `${basePath}/projects`, icon: <FolderKanban size={18} />, roles: ['super_admin', 'creator', 'municipality_user'], badge: null },
+
     { label: '商品一覧', path: `${basePath}/products`, icon: <ShoppingBag size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },
     { label: '案件一覧', path: `${basePath}/images`, icon: <ImageIcon size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },
     { label: '設定', path: `${basePath}/users`, icon: <SettingsIcon size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },

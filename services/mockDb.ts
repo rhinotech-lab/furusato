@@ -37,6 +37,40 @@ export const BUSINESS_USERS: User[] = [
   { id: 103, business_id: 3, email: "ichigo@example.com", name: "博多フルーツ担当", role: "business_user" }
 ];
 
+// 全ユーザーを統合
+export const ALL_USERS: User[] = [
+  ...ADMIN_USERS,
+  ...MUNICIPALITY_USERS,
+  ...BUSINESS_USERS
+];
+
+// IDとパスワードのマッピング（開発用：本番ではハッシュ化）
+export const USER_CREDENTIALS: Record<number, string> = {
+  1: "admin123",      // 管理太郎
+  2: "creator123",    // 制作花子
+  3: "sapporo123",    // 札幌担当
+  5: "fukuoka123",    // 福岡担当
+  101: "farm123",     // ファーム担当
+  102: "suisan123",   // 札幌水産担当
+  103: "ichigo123"    // 博多フルーツ担当
+};
+
+// IDでユーザーを検索
+export const getUserById = (id: number): User | undefined => {
+  return ALL_USERS.find(u => u.id === id);
+};
+
+// IDとパスワードで認証
+export const authenticateUser = (id: number, password: string): User | null => {
+  const user = getUserById(id);
+  if (!user) return null;
+  
+  const correctPassword = USER_CREDENTIALS[id];
+  if (!correctPassword || correctPassword !== password) return null;
+  
+  return user;
+};
+
 export let PROJECTS: Project[] = [
   { 
     id: 1, 
@@ -83,10 +117,10 @@ let images: ImageEntity[] = [
   {
     id: 1,
     product_id: 1,
-    title: "メインバナー_楽天用",
+    title: "2026年2月　肉類系",
     external_url: "https://item.rakuten.co.jp/example-shop/011002/",
     created_by_admin_id: 2,
-    created_at: "2025-01-10T10:00:00",
+    created_at: "2026-02-01T10:00:00",
     versions: [
       {
         id: 1001,
@@ -94,8 +128,8 @@ let images: ImageEntity[] = [
         version_number: 1,
         file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80",
         status: 'approved',
-        submitted_at: "2025-01-10T15:00:00",
-        created_at: "2025-01-10T15:00:00"
+        submitted_at: "2026-02-01T15:00:00",
+        created_at: "2026-02-01T15:00:00"
       },
       {
         id: 10012,
@@ -103,8 +137,8 @@ let images: ImageEntity[] = [
         version_number: 2,
         file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80",
         status: 'rejected',
-        submitted_at: "2025-01-11T12:00:00",
-        created_at: "2025-01-11T12:00:00"
+        submitted_at: "2026-02-03T12:00:00",
+        created_at: "2026-02-03T12:00:00"
       },
       {
         id: 10013,
@@ -112,17 +146,17 @@ let images: ImageEntity[] = [
         version_number: 3,
         file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80",
         status: 'pending_review',
-        submitted_at: "2025-01-12T15:00:00",
-        created_at: "2025-01-12T15:00:00"
+        submitted_at: "2026-02-05T15:00:00",
+        created_at: "2026-02-05T15:00:00"
       }
     ]
   },
   {
     id: 4,
-    product_id: 1,
-    title: "スマホ用_楽天",
+    product_id: 2,
+    title: "2026年2月　魚介類系",
     created_by_admin_id: 2,
-    created_at: "2025-01-10T11:00:00",
+    created_at: "2026-02-03T11:00:00",
     versions: [
       {
         id: 1004,
@@ -130,17 +164,17 @@ let images: ImageEntity[] = [
         version_number: 1,
         file_path: "https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=1000&q=80",
         status: 'pending_review',
-        submitted_at: "2025-01-10T15:30:00",
-        created_at: "2025-01-10T15:30:00"
+        submitted_at: "2026-02-03T15:30:00",
+        created_at: "2026-02-03T15:30:00"
       }
     ]
   },
   {
     id: 5,
-    product_id: 1,
-    title: "正方形サムネイル_楽天",
+    product_id: 3,
+    title: "2026年3月　果物系",
     created_by_admin_id: 2,
-    created_at: "2025-01-10T11:30:00",
+    created_at: "2026-03-01T11:30:00",
     versions: [
       {
         id: 1005,
@@ -148,17 +182,17 @@ let images: ImageEntity[] = [
         version_number: 1,
         file_path: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&q=80",
         status: 'approved',
-        submitted_at: "2025-01-10T16:00:00",
-        created_at: "2025-01-10T16:00:00"
+        submitted_at: "2026-03-01T16:00:00",
+        created_at: "2026-03-01T16:00:00"
       }
     ]
   },
   {
     id: 6,
     product_id: 1,
-    title: "SNS広告用_Instagram",
+    title: "2026年1月　肉類系",
     created_by_admin_id: 2,
-    created_at: "2025-01-11T10:00:00",
+    created_at: "2026-01-15T10:00:00",
     versions: [
       {
         id: 1006,
@@ -166,17 +200,17 @@ let images: ImageEntity[] = [
         version_number: 1,
         file_path: "https://images.unsplash.com/photo-1484723088339-fe28233e562e?w=1000&q=80",
         status: 'pending_review',
-        submitted_at: "2025-01-11T11:00:00",
-        created_at: "2025-01-11T11:00:00"
+        submitted_at: "2026-01-15T11:00:00",
+        created_at: "2026-01-15T11:00:00"
       }
     ]
   },
   {
     id: 7,
-    product_id: 1,
-    title: "さとふる用_メイン",
+    product_id: 2,
+    title: "2026年1月　魚介類系",
     created_by_admin_id: 2,
-    created_at: "2025-01-12T10:00:00",
+    created_at: "2026-01-20T10:00:00",
     versions: [
       {
         id: 1007,
@@ -184,8 +218,8 @@ let images: ImageEntity[] = [
         version_number: 1,
         file_path: "https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=1000&q=80",
         status: 'revising',
-        submitted_at: "2025-01-12T11:00:00",
-        created_at: "2025-01-12T11:00:00"
+        submitted_at: "2026-01-20T11:00:00",
+        created_at: "2026-01-20T11:00:00"
       }
     ]
   }

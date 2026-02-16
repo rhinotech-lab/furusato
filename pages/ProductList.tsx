@@ -2,14 +2,16 @@
 import React, { useState, useMemo } from 'react';
 import { mockDb, BUSINESSES, PORTALS, MUNICIPALITIES, PRODUCTS } from '../services/mockDb';
 import { useAuth } from '../context/AuthContext';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Search, Plus, Edit, ArrowRight, ChevronRight, MapPin, Tag, Calendar, ExternalLink, Clock } from 'lucide-react';
 
 export const ProductList: React.FC = () => {
   const { currentUser } = useAuth();
-  const { businessId } = useParams<{ businessId: string }>();
+  const { businessId: paramBusinessId } = useParams<{ businessId: string }>();
+  const [searchParams] = useSearchParams();
+  const businessId = paramBusinessId || searchParams.get('businessId') || '';
   const [filterMunicipality, setFilterMunicipality] = useState('');
-  const [filterBusiness, setFilterBusiness] = useState(businessId || '');
+  const [filterBusiness, setFilterBusiness] = useState(businessId);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMonth, setSelectedMonth] = useState<string>('all'); // YYYY-MM or 'all'
 

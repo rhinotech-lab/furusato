@@ -320,15 +320,15 @@ export const ImageList: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide pb-12">
+      <div className="flex-1 overflow-auto pb-12">
         {filteredImages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-40 text-slate-300 gap-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
               <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center"><ImageIcon size={48} className="opacity-10" /></div>
               <p className="font-bold text-base tracking-tight">対象の案件が見つかりませんでした</p>
           </div>
         ) : (
-          <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100 overflow-hidden">
-            <table className="w-full text-left border-separate border-spacing-0">
+          <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100">
+            <table className="min-w-[1400px] w-full text-left border-separate border-spacing-0">
               <thead className="sticky top-0 z-20">
                 <tr className="bg-slate-50/80 backdrop-blur-md text-slate-400 text-[10px] font-black uppercase tracking-widest shadow-sm">
                   <th className="px-10 py-5 w-16 text-center border-b border-slate-100"></th>
@@ -336,6 +336,9 @@ export const ImageList: React.FC = () => {
                   <th className="px-10 py-5 border-b border-slate-100">案件タイトル / 商品情報</th>
                   {isAdmin && <th className="px-10 py-5 border-b border-slate-100">自治体名</th>}
                   <th className="px-10 py-5 border-b border-slate-100">事業者名</th>
+                  <th className="px-6 py-5 w-24 border-b border-slate-100 text-center">登録商品数</th>
+                  <th className="px-6 py-5 w-32 border-b border-slate-100 text-center">作成日</th>
+                  <th className="px-6 py-5 w-32 border-b border-slate-100 text-center">改修期限</th>
                   <th className="px-6 py-5 w-24 border-b border-slate-100 text-center">改修数</th>
                   <th className="px-6 py-5 w-40 border-b border-slate-100 text-center">更新日時</th>
                   <th className="px-6 py-5 w-16 border-b border-slate-100 text-center">URL</th>
@@ -390,6 +393,31 @@ export const ImageList: React.FC = () => {
                       )}
                       <td className="px-10 py-7">
                         <span className="text-xs font-bold text-slate-600 truncate block max-w-[160px]">{img.business?.name || '---'}</span>
+                      </td>
+                      <td className="px-6 py-7 text-center">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-accent rounded-lg text-[11px] font-black border border-blue-100">
+                          {img.business ? PRODUCTS.filter(p => p.business_id === img.business!.id).length : 0}
+                        </span>
+                      </td>
+                      <td className="px-6 py-7 text-center whitespace-nowrap">
+                        <span className="text-xs font-mono font-black text-slate-500 tracking-tighter">
+                          {new Date(img.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-7 text-center whitespace-nowrap">
+                        {img.product?.deadline ? (
+                          <div className="flex flex-col items-center">
+                            <span className={`text-xs font-mono font-black tracking-tighter ${new Date(img.product.deadline) < new Date() ? 'text-red-500' : 'text-slate-500'}`}>
+                              {new Date(img.product.deadline).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                            </span>
+                            {(() => {
+                              const diff = Math.ceil((new Date(img.product!.deadline!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                              if (diff < 0) return <span className="text-[10px] font-black text-red-400 mt-0.5">{Math.abs(diff)}日超過</span>;
+                              if (diff <= 7) return <span className="text-[10px] font-black text-amber-500 mt-0.5">残り{diff}日</span>;
+                              return null;
+                            })()}
+                          </div>
+                        ) : <span className="text-[11px] font-black text-slate-200">---</span>}
                       </td>
                       <td className="px-6 py-7 text-center">
                         <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-black border border-slate-100">

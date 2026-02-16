@@ -172,7 +172,7 @@ export const BusinessList: React.FC = () => {
                           {getLastActivity(b.id)}
                         </div>
                         <Link 
-                          to={`${basePath}/products/business/${b.id}`}
+                          to={`${basePath}/products?businessId=${b.id}`}
                           className="text-[9px] font-black text-accent uppercase tracking-widest hover:underline flex items-center gap-0.5"
                         >
                           商品詳細 <ChevronRight size={10} />

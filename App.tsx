@@ -14,7 +14,7 @@ import { BusinessList } from './pages/BusinessList';
 import { BusinessForm } from './pages/BusinessForm';
 import { ProductList } from './pages/ProductList';
 import { ProductForm } from './pages/ProductForm';
-import { ProjectList } from './pages/ProjectList';
+
 import { AccountSettings } from './pages/AccountSettings';
 import { NotificationList } from './pages/NotificationList';
 import { AlertList } from './pages/AlertList';
@@ -57,7 +57,6 @@ const App: React.FC = () => {
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<ProductForm />} />
             <Route path="products/:id/edit" element={<ProductForm />} />
-            <Route path="projects" element={<ProjectList />} />
             <Route path="users" element={<AccountSettings />} />
           </Route>
 
@@ -75,7 +74,6 @@ const App: React.FC = () => {
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<ProductForm />} />
             <Route path="products/:id/edit" element={<ProductForm />} />
-            <Route path="projects" element={<ProjectList />} />
             <Route path="users" element={<AccountSettings />} />
           </Route>
 

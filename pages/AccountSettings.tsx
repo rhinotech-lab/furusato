@@ -7,8 +7,6 @@ import {
   Save, 
   Plus, 
   Settings as SettingsIcon,
-  Zap,
-  CalendarDays,
   MoreVertical,
   Building,
   MapPin,
@@ -18,7 +16,6 @@ import {
   AlertTriangle,
   ListChecks,
   Check,
-  Moon,
   Sparkles,
   Loader2,
   RefreshCw,
@@ -97,8 +94,6 @@ export const AccountSettings: React.FC = () => {
 
 const AccountSection: React.FC = () => {
   const { currentUser, appSettings, updateSettings } = useAuth();
-  const [notifType, setNotifType] = useState<'realtime' | 'digest'>('realtime');
-  const [quietMode, setQuietMode] = useState(true);
 
   const toggleEmailSetting = (key: 'emailNotifyOnUpload' | 'emailNotifyOnApprovalRequest' | 'emailIncludeDirectLinks') => {
     updateSettings({ [key]: !appSettings[key] });
@@ -186,43 +181,6 @@ const AccountSection: React.FC = () => {
                 </div>
             </div>
         </section>
-
-        <section className="space-y-6">
-            <h3 className="text-lg font-black text-slate-900 flex items-center gap-2 tracking-tight">
-                <Moon size={20} className="text-blue-500" />
-                通知スケジュール
-            </h3>
-            <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onClick={() => setNotifType('realtime')} className={`p-6 rounded-[2rem] border-2 text-left transition-all ${notifType === 'realtime' ? 'border-accent bg-blue-50/50 shadow-sm' : 'border-slate-50 bg-slate-50/50'}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Zap size={16} className={notifType === 'realtime' ? 'text-accent' : 'text-slate-300'} />
-                          <p className="font-black text-sm text-slate-900">即時通知</p>
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-bold leading-relaxed">コメントやステータス更新のたびに、リアルタイムで通知を受け取ります。</p>
-                    </button>
-                    <button onClick={() => setNotifType('digest')} className={`p-6 rounded-[2rem] border-2 text-left transition-all ${notifType === 'digest' ? 'border-accent bg-blue-50/50 shadow-sm' : 'border-slate-50 bg-slate-50/50'}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <CalendarDays size={16} className={notifType === 'digest' ? 'text-accent' : 'text-slate-300'} />
-                          <p className="font-black text-sm text-slate-900">1日1回まとめ通知</p>
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-bold leading-relaxed">その日の全ての活動内容を、翌朝8時にまとめてダイジェストで受け取ります。</p>
-                    </button>
-                </div>
-                <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white rounded-2xl text-slate-400 shadow-sm"><Moon size={20} /></div>
-                        <div>
-                            <p className="text-sm font-black text-slate-900 mb-1">働き方改革モード (夜間・休日停止)</p>
-                            <p className="text-[10px] text-slate-400 font-bold">19:00 〜 08:00、および土日祝日の通知を完全に停止します。</p>
-                        </div>
-                    </div>
-                    <button onClick={() => setQuietMode(!quietMode)} className={`w-12 h-6 rounded-full p-1 transition-all flex items-center ${quietMode ? 'bg-slate-900 justify-end shadow-lg shadow-slate-200' : 'bg-slate-200 justify-start'}`}>
-                        <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
-                    </button>
-                </div>
-            </div>
-        </section>
       </div>
 
       <div className="p-10 flex justify-end bg-slate-50/50">
@@ -264,8 +222,8 @@ const TeamSection: React.FC = () => {
               <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black text-xs overflow-hidden">
-                            <img src={`https://i.pravatar.cc/150?u=${user.email}`} className="w-full h-full object-cover" alt="" />
+                        <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center text-slate-600 font-black text-sm">
+                            {user.name.charAt(0)}
                         </div>
                         <div className="flex flex-col">
                             <span className="font-bold text-slate-900">{user.name}</span>
