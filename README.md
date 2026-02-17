@@ -171,5 +171,24 @@ npm run dev
 ## 開発ガイド
 
 詳細な開発ガイドについては、[DEVELOPMENT.md](./DEVELOPMENT.md) を参照してください。
-# furusato
-# furusato
+
+## 本番環境デプロイ
+
+本番環境へのデプロイ手順については、[doc/PRODUCTION.md](./doc/PRODUCTION.md) を参照してください。
+
+### セットアップスクリプト
+
+GCP本番環境のセットアップには、`scripts/` ディレクトリ内のスクリプトを使用します：
+
+```bash
+# 基本リソース作成
+./scripts/setup/setup-gcp.sh redhorse-prod
+
+# 環境変数・接続設定
+./scripts/setup/run-next-steps.sh
+
+# セットアップ状況確認
+./scripts/verify/check-setup-status.sh redhorse-prod
+```
+
+詳細は [scripts/README.md](./scripts/README.md) を参照してください。
