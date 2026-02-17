@@ -37,7 +37,7 @@ MySQL インスタンスを作成し、アプリ用の DB とユーザーを準�
 
 ## 4. Cloud Storage バケットを作成
 アプリで利用するストレージ用バケットを作成します。
-- バケット名例: `app-storage-bucket`
+- バケット名例: `furusato-storage-<project-id>` (プロジェクトIDを含む一意な名前)
 - リージョン例: `asia-northeast1`
 
 ## 5. Cloud Run サービスを作成
