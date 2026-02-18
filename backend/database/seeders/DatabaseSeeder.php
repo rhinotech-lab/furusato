@@ -21,6 +21,14 @@ class DatabaseSeeder extends Seeder
             'type' => 'admin',
         ]);
 
+        // 制作者ユーザーを作成
+        User::create([
+            'name' => '制作者',
+            'email' => 'creator@example.com',
+            'password' => Hash::make('password'),
+            'type' => 'admin',
+        ]);
+
         // 自治体ユーザーのサンプル
         User::create([
             'name' => '自治体ユーザー',

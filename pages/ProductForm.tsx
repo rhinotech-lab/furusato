@@ -87,21 +87,20 @@ export const ProductForm: React.FC = () => {
   );
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 py-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-2xl shadow-sm border border-slate-100 transition-all active:scale-90">
-          <ArrowLeft size={20} />
+        <button onClick={() => navigate(-1)} className="p-2 bg-white text-slate-400 hover:text-slate-900 rounded-xl shadow-sm border border-slate-100 transition-all active:scale-90">
+          <ArrowLeft size={16} />
         </button>
         <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tighter">
+            <h1 className="text-xl font-black text-slate-900 tracking-tighter">
                 {isEdit ? '商品情報の編集' : '商品の新規登録'}
             </h1>
-            <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Product Data Entry</p>
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-[2.5rem] shadow-premium border border-slate-100">
-        <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="bg-white p-6 rounded-2xl shadow-premium border border-slate-100">
+        <form onSubmit={handleSubmit} className="space-y-6">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {currentUser?.role !== 'municipality_user' && (
@@ -110,7 +109,7 @@ export const ProductForm: React.FC = () => {
                         自治体 (絞り込み用)
                     </label>
                     <select
-                        className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                        className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all appearance-none cursor-pointer"
                         value={selectedMunicipalityId}
                         onChange={e => {
                             setSelectedMunicipalityId(e.target.value);
@@ -131,7 +130,7 @@ export const ProductForm: React.FC = () => {
                 </label>
                 <select
                     required
-                    className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer disabled:opacity-50"
+                    className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all appearance-none cursor-pointer disabled:opacity-50"
                     value={formData.business_id}
                     onChange={e => setFormData({...formData, business_id: e.target.value})}
                     disabled={!selectedMunicipalityId && currentUser?.role !== 'municipality_user'}
@@ -148,7 +147,7 @@ export const ProductForm: React.FC = () => {
                   ジャンル
                 </label>
                 <select
-                    className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all appearance-none cursor-pointer"
                     value={formData.genre}
                     onChange={e => setFormData({...formData, genre: e.target.value})}
                 >
@@ -165,7 +164,7 @@ export const ProductForm: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300 font-mono"
+                  className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all placeholder:text-slate-300 font-mono"
                   placeholder="例: P-12345"
                   value={formData.product_code}
                   onChange={e => setFormData({...formData, product_code: e.target.value})}
@@ -177,9 +176,9 @@ export const ProductForm: React.FC = () => {
                   温度帯
                 </label>
                 <div className="relative">
-                  <Thermometer className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                  <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
                   <select
-                      className="w-full pl-12 pr-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all appearance-none cursor-pointer"
                       value={formData.temperature_range}
                       onChange={e => setFormData({...formData, temperature_range: e.target.value as TemperatureRange})}
                   >
@@ -198,7 +197,7 @@ export const ProductForm: React.FC = () => {
                 <input
                   type="text"
                   required
-                  className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300"
+                  className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all placeholder:text-slate-300"
                   placeholder="例: 特選牛セット"
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
@@ -206,9 +205,9 @@ export const ProductForm: React.FC = () => {
               </div>
 
               <div className="md:col-span-1">
-                <label className="flex items-center gap-3 cursor-pointer group p-3 bg-slate-50 rounded-2xl border-2 border-transparent hover:border-accent/20 transition-all h-full">
-                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${formData.has_materials ? 'bg-accent border-accent text-white shadow-lg shadow-accent/20' : 'border-slate-300 bg-white'}`}>
-                    {formData.has_materials && <FolderCheck size={14} strokeWidth={3} />}
+                <label className="flex items-center gap-3 cursor-pointer group p-2.5 bg-slate-50 rounded-xl border-2 border-transparent hover:border-accent/20 transition-all h-full">
+                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.has_materials ? 'bg-accent border-accent text-white shadow-lg shadow-accent/20' : 'border-slate-300 bg-white'}`}>
+                    {formData.has_materials && <FolderCheck size={12} strokeWidth={3} />}
                   </div>
                   <input
                     type="checkbox"
@@ -225,7 +224,7 @@ export const ProductForm: React.FC = () => {
                   内部メモ <span className="text-slate-300 font-medium ml-1">(任意)</span>
                 </label>
                 <textarea
-                  className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl focus:ring-4 focus:ring-accent/5 focus:bg-white outline-none font-bold text-slate-700 transition-all placeholder:text-slate-300 min-h-[100px]"
+                  className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all placeholder:text-slate-300 min-h-[80px]"
                   placeholder="制作上の注意点や連絡事項など"
                   rows={3}
                   value={formData.internal_memo}
@@ -234,19 +233,19 @@ export const ProductForm: React.FC = () => {
               </div>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-slate-50 mt-10 pt-10">
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-50">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-8 py-3.5 text-slate-400 bg-slate-50 hover:bg-slate-100 hover:text-slate-600 rounded-2xl font-bold transition-all"
+              className="px-6 py-2.5 text-slate-400 bg-slate-50 hover:bg-slate-100 hover:text-slate-600 rounded-xl font-bold text-sm transition-all"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-10 py-3.5 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95 font-bold"
+              className="flex items-center gap-1.5 px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-95 font-bold text-sm"
             >
-              <Save size={18} />
+              <Save size={14} />
               保存する
             </button>
           </div>

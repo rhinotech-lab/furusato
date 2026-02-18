@@ -9,6 +9,27 @@ const getRelDate = (days: number) => {
     return d.toISOString().split('T')[0];
 };
 
+// localStorage永続化ヘルパー
+const STORAGE_PREFIX = 'furusato_db_';
+
+function loadFromStorage<T>(key: string, fallback: T): T {
+  try {
+    const stored = localStorage.getItem(STORAGE_PREFIX + key);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.warn(`Failed to load ${key} from localStorage`, e);
+  }
+  return fallback;
+}
+
+function saveToStorage<T>(key: string, data: T): void {
+  try {
+    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(data));
+  } catch (e) {
+    console.warn(`Failed to save ${key} to localStorage`, e);
+  }
+}
+
 export const PORTALS = [
   { id: 'rakuten', label: '楽', full: '楽天', color: 'bg-red-500' },
   { id: 'choice', label: 'チ', full: 'チョイス', color: 'bg-emerald-500' },
@@ -16,10 +37,12 @@ export const PORTALS = [
   { id: 'furunavi', label: 'ふ', full: 'ふるなび', color: 'bg-blue-500' }
 ];
 
-export let MUNICIPALITIES: Municipality[] = [
+const DEFAULT_MUNICIPALITIES: Municipality[] = [
   { id: 1, name: "北海道札幌市", code: "011002" },
   { id: 3, name: "福岡県福岡市", code: "401307" }
 ];
+
+export let MUNICIPALITIES: Municipality[] = loadFromStorage('municipalities', DEFAULT_MUNICIPALITIES);
 
 export const ADMIN_USERS: User[] = [
   { id: 1, email: "admin@example.com", name: "管理太郎", role: "super_admin" },
@@ -71,7 +94,7 @@ export const authenticateUser = (id: number, password: string): User | null => {
   return user;
 };
 
-export let PROJECTS: Project[] = [
+const DEFAULT_PROJECTS: Project[] = [
   { 
     id: 1, 
     name: "冬の特産品キャンペーン2025", 
@@ -101,19 +124,25 @@ export let PROJECTS: Project[] = [
   }
 ];
 
-export let BUSINESSES: Business[] = [
+export let PROJECTS: Project[] = loadFromStorage('projects', DEFAULT_PROJECTS);
+
+const DEFAULT_BUSINESSES: Business[] = [
   { id: 1, municipality_id: 1, name: "ファーム北海道", code: "B-0001", category: "肉類", portals: ["rakuten", "choice", "satofull", "furunavi"] },
   { id: 2, municipality_id: 1, name: "札幌水産", code: "B-0002", category: "魚介類", portals: ["rakuten", "choice"] },
   { id: 3, municipality_id: 3, name: "博多フルーツガーデン", code: "B-0003", category: "果物", portals: ["rakuten", "choice", "satofull"] }
 ];
 
-export let PRODUCTS: Product[] = [
+export let BUSINESSES: Business[] = loadFromStorage('businesses', DEFAULT_BUSINESSES);
+
+const DEFAULT_PRODUCTS: Product[] = [
   { id: 1, business_id: 1, project_id: 1, name: "特選ジンギスカンセット 1.2kg", genre: "肉類", description: "北海道産ラム肉使用。秘伝のタレ付き。", product_code: "P-GEN-01", deadline: getRelDate(-2), unread_comments_count: 0, donation_amount: 15000, temperature_range: 'refrigerated', has_materials: true, portals: ["rakuten", "choice", "satofull", "furunavi"] },
   { id: 2, business_id: 2, project_id: 1, name: "いくら醤油漬け 500g", genre: "魚介類", description: "新鮮な鮭卵を使用。", product_code: "P-SEA-01", deadline: getRelDate(3), unread_comments_count: 2, donation_amount: 18000, temperature_range: 'frozen', has_materials: true, portals: ["rakuten", "choice"] },
   { id: 3, business_id: 3, project_id: 2, name: "博多あまおう 4パック", genre: "果物", description: "大粒で甘い福岡ブランド苺。", product_code: "P-FRU-01", deadline: getRelDate(5), unread_comments_count: 0, donation_amount: 12000, temperature_range: 'refrigerated', has_materials: true, portals: ["rakuten", "choice", "satofull"] }
 ];
 
-let images: ImageEntity[] = [
+export let PRODUCTS: Product[] = loadFromStorage('products', DEFAULT_PRODUCTS);
+
+const DEFAULT_IMAGES: ImageEntity[] = [
   {
     id: 1,
     product_id: 1,
@@ -225,10 +254,14 @@ let images: ImageEntity[] = [
   }
 ];
 
-let comments: Comment[] = [
+let images: ImageEntity[] = loadFromStorage('images', DEFAULT_IMAGES);
+
+const DEFAULT_COMMENTS: Comment[] = [
   { id: 1, image_id: 1, commenter_type: 'admin', commenter_id: 2, commenter_name: "制作花子", body: "最新の修正版です。ご確認ください。", created_at: "2025-01-10T15:05:00" },
   { id: 2, image_id: 3, commenter_type: 'municipality', commenter_id: 5, commenter_name: "福岡担当", body: "右下の『予約』の文字をもっと大きくしてください。", created_at: "2025-01-11T09:00:00" }
 ];
+
+let comments: Comment[] = loadFromStorage('comments', DEFAULT_COMMENTS);
 
 export const mockDb = {
   getMunicipalities: () => MUNICIPALITIES,
@@ -243,8 +276,10 @@ export const mockDb = {
   getImageById: (id: number) => images.find(img => img.id === id),
   
   addMunicipality: (data: any) => {
-    const newMuni = { ...data, id: MUNICIPALITIES.length + 1 };
+    const maxId = MUNICIPALITIES.reduce((max, m) => Math.max(max, m.id), 0);
+    const newMuni = { ...data, id: maxId + 1 };
     MUNICIPALITIES.push(newMuni);
+    saveToStorage('municipalities', MUNICIPALITIES);
     return newMuni;
   },
 
@@ -252,12 +287,15 @@ export const mockDb = {
     const index = MUNICIPALITIES.findIndex(m => m.id === id);
     if (index !== -1) {
       MUNICIPALITIES[index] = { ...MUNICIPALITIES[index], ...data };
+      saveToStorage('municipalities', MUNICIPALITIES);
     }
   },
   
   addBusiness: (data: any) => {
-    const newBiz = { ...data, id: BUSINESSES.length + 1 };
+    const maxId = BUSINESSES.reduce((max, b) => Math.max(max, b.id), 0);
+    const newBiz = { ...data, id: maxId + 1 };
     BUSINESSES.push(newBiz);
+    saveToStorage('businesses', BUSINESSES);
     return newBiz;
   },
 
@@ -265,12 +303,23 @@ export const mockDb = {
     const index = BUSINESSES.findIndex(b => b.id === id);
     if (index !== -1) {
       BUSINESSES[index] = { ...BUSINESSES[index], ...data };
+      saveToStorage('businesses', BUSINESSES);
+    }
+  },
+
+  deleteBusiness: (id: number) => {
+    const index = BUSINESSES.findIndex(b => b.id === id);
+    if (index !== -1) {
+      BUSINESSES.splice(index, 1);
+      saveToStorage('businesses', BUSINESSES);
     }
   },
 
   addProduct: (data: any) => {
-    const newProd = { ...data, id: PRODUCTS.length + 1 };
+    const maxId = PRODUCTS.reduce((max, p) => Math.max(max, p.id), 0);
+    const newProd = { ...data, id: maxId + 1 };
     PRODUCTS.push(newProd);
+    saveToStorage('products', PRODUCTS);
     return newProd;
   },
 
@@ -278,6 +327,23 @@ export const mockDb = {
     const index = PRODUCTS.findIndex(p => p.id === id);
     if (index !== -1) {
       PRODUCTS[index] = { ...PRODUCTS[index], ...data };
+      saveToStorage('products', PRODUCTS);
+    }
+  },
+
+  addProject: (data: any) => {
+    const maxId = PROJECTS.reduce((max, p) => Math.max(max, p.id), 0);
+    const newProj = { ...data, id: maxId + 1, created_at: new Date().toISOString().split('T')[0] };
+    PROJECTS.push(newProj);
+    saveToStorage('projects', PROJECTS);
+    return newProj;
+  },
+
+  updateProject: (id: number, data: any) => {
+    const index = PROJECTS.findIndex(p => p.id === id);
+    if (index !== -1) {
+      PROJECTS[index] = { ...PROJECTS[index], ...data };
+      saveToStorage('projects', PROJECTS);
     }
   },
 
@@ -302,19 +368,26 @@ export const mockDb = {
       }]
     };
     images.push(newImage);
+    saveToStorage('images', images);
     return newImage;
   },
 
   updateImageExternalUrl: (id: number, url: string) => {
     const img = images.find(i => i.id === id);
-    if (img) img.external_url = url;
+    if (img) {
+      img.external_url = url;
+      saveToStorage('images', images);
+    }
   },
   
   updateVersionStatus: (imageId: number, versionId: number, status: ImageStatus) => {
     const img = images.find(i => i.id === imageId);
     if (img) {
       const ver = img.versions.find(v => v.id === versionId);
-      if (ver) ver.status = status;
+      if (ver) {
+        ver.status = status;
+        saveToStorage('images', images);
+      }
     }
   },
 
@@ -322,9 +395,13 @@ export const mockDb = {
   addComment: (data: any) => {
     const newComment = { ...data, id: Date.now(), created_at: new Date().toISOString() };
     comments.push(newComment);
+    saveToStorage('comments', comments);
     return newComment;
   },
-  deleteComment: (id: number) => { comments = comments.filter(c => c.id !== id); },
+  deleteComment: (id: number) => {
+    comments = comments.filter(c => c.id !== id);
+    saveToStorage('comments', comments);
+  },
   getNotifications: () => [],
   markNotificationsAsRead: () => {}
 };

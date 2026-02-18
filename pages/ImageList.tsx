@@ -253,11 +253,10 @@ export const ImageList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 relative pb-24 h-full flex flex-col px-8 lg:px-12 pt-8">
+    <div className="space-y-6 animate-in fade-in duration-700 relative h-full flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div className="flex flex-col">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tighter">案件管理</h1>
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1 opacity-60">Banner Production Pipeline</p>
+            <h1 className="text-xl font-black text-slate-900 tracking-tighter">案件一覧</h1>
         </div>
         
         <div className="flex items-center gap-4">
@@ -322,29 +321,35 @@ export const ImageList: React.FC = () => {
 
       <div className="flex-1 overflow-auto pb-12">
         {filteredImages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-40 text-slate-300 gap-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
-              <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center"><ImageIcon size={48} className="opacity-10" /></div>
-              <p className="font-bold text-base tracking-tight">対象の案件が見つかりませんでした</p>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-300 gap-4 bg-white rounded-[1.5rem] border border-slate-100 shadow-sm">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center"><ImageIcon size={32} className="opacity-10" /></div>
+              <p className="font-bold text-[14px] tracking-tight">対象の案件が見つかりませんでした</p>
           </div>
         ) : (
-          <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100">
-            <table className="min-w-[1400px] w-full text-left border-separate border-spacing-0">
+          <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden">
+            <table className="w-full text-left border-separate border-spacing-0 table-fixed">
+              <colgroup>
+                <col style={{ width: '3%' }} />
+                <col style={{ width: '5%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '11%' }} />
+                <col style={{ width: '5%' }} />
+                <col style={{ width: '13%' }} />
+                <col style={{ width: '9%' }} />
+                <col style={{ width: '31%' }} />
+                <col style={{ width: '3%' }} />
+              </colgroup>
               <thead className="sticky top-0 z-20">
-                <tr className="bg-slate-50/80 backdrop-blur-md text-slate-400 text-[10px] font-black uppercase tracking-widest shadow-sm">
-                  <th className="px-10 py-5 w-16 text-center border-b border-slate-100"></th>
-                  <th className="px-2 py-5 w-24 text-center border-b border-slate-100">プレビュー</th>
-                  <th className="px-10 py-5 border-b border-slate-100">案件タイトル / 商品情報</th>
-                  {isAdmin && <th className="px-10 py-5 border-b border-slate-100">自治体名</th>}
-                  <th className="px-10 py-5 border-b border-slate-100">事業者名</th>
-                  <th className="px-6 py-5 w-24 border-b border-slate-100 text-center">登録商品数</th>
-                  <th className="px-6 py-5 w-32 border-b border-slate-100 text-center">作成日</th>
-                  <th className="px-6 py-5 w-32 border-b border-slate-100 text-center">改修期限</th>
-                  <th className="px-6 py-5 w-24 border-b border-slate-100 text-center">改修数</th>
-                  <th className="px-6 py-5 w-40 border-b border-slate-100 text-center">更新日時</th>
-                  <th className="px-6 py-5 w-16 border-b border-slate-100 text-center">URL</th>
-                  <th className="px-6 py-5 w-16 border-b border-slate-100 text-center">保存</th>
-                  <th className="px-8 py-5 w-36 border-b border-slate-100 text-center">ステータス</th>
-                  <th className="px-10 py-5 w-16 border-b border-slate-100"></th>
+                <tr className="bg-white/95 backdrop-blur-sm text-slate-400 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                  <th className="pl-3 pr-1 py-3 text-center border-b border-slate-100"></th>
+                  <th className="px-1 py-3 text-center border-b border-slate-100">画像</th>
+                  <th className="px-2 py-3 border-b border-slate-100">案件 / 商品</th>
+                  <th className="px-2 py-3 border-b border-slate-100">{isAdmin ? '自治体 / 事業者' : '事業者'}</th>
+                  <th className="px-2 py-3 border-b border-slate-100 text-center">商品数</th>
+                  <th className="px-2 py-3 border-b border-slate-100 text-center">作成日 / 期限</th>
+                  <th className="px-2 py-3 border-b border-slate-100 text-center">版 / 更新</th>
+                  <th className="px-2 py-3 border-b border-slate-100 text-center">操作 / ステータス</th>
+                  <th className="px-1 py-3 border-b border-slate-100"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -352,104 +357,108 @@ export const ImageList: React.FC = () => {
                    const isSelected = selectedIds.has(img.id);
                    const municipality = MUNICIPALITIES.find(m => m.id === img.business?.municipality_id);
                    const updateDate = new Date(img.latestVersion.created_at);
+                   const deadlineDiff = img.product?.deadline ? Math.ceil((new Date(img.product.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
                    return (
                     <tr key={img.id} className={`group transition-all ${isSelected ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}>
-                      <td className="px-10 py-7 text-center">
+                      {/* チェックボックス */}
+                      <td className="pl-3 pr-1 py-3 text-center border-b border-slate-50/50">
                          {img.latestVersion.status === 'pending_review' ? (
-                           <button onClick={() => toggleSelect(img.id)} className="transition-transform active:scale-90">{isSelected ? <CheckSquare size={22} className="text-accent" /> : <Square size={22} className="text-slate-200" />}</button>
-                         ) : <div className="w-6 h-6 mx-auto opacity-5"><Square size={22} /></div>}
+                           <button onClick={() => toggleSelect(img.id)} className="transition-transform active:scale-90">{isSelected ? <CheckSquare size={16} className="text-accent" /> : <Square size={16} className="text-slate-200" />}</button>
+                         ) : <div className="w-4 h-4 mx-auto opacity-5"><Square size={16} /></div>}
                       </td>
-                      <td className="px-2 py-7">
-                        <div className="w-20 h-12 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 mx-auto shadow-sm group-hover:scale-110 transition-transform">
+                      {/* プレビュー */}
+                      <td className="px-1 py-3 border-b border-slate-50/50">
+                        <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 mx-auto shadow-sm group-hover:scale-110 transition-transform">
                            <img src={img.latestVersion.file_path} alt="" className="w-full h-full object-cover" />
                         </div>
                       </td>
-                      <td className="px-10 py-7 min-w-[300px]">
+                      {/* 案件タイトル / 商品情報 */}
+                      <td className="px-2 py-3 border-b border-slate-50/50 overflow-hidden">
                         <div className="flex flex-col min-w-0">
-                            <span className="font-bold text-slate-800 text-[15px] truncate leading-tight mb-1.5 group-hover:text-accent transition-colors">{img.title}</span>
-                            <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-800 text-[13px] truncate leading-tight group-hover:text-accent transition-colors">{img.title}</span>
+                            <div className="flex items-center gap-1 min-w-0">
                               {img.product && (
                                 <Link 
                                   to={`${basePath}/products/${img.product.id}/edit`} 
-                                  className="text-[11px] text-slate-400 font-bold uppercase truncate max-w-[220px] hover:text-accent flex items-center gap-1 transition-colors"
+                                  className="text-[10px] text-slate-400 font-bold truncate hover:text-accent flex items-center gap-0.5 transition-colors min-w-0"
                                   title="商品詳細ページへ"
                                 >
-                                  <ShoppingBag size={10} className="shrink-0" />
-                                  {img.product.name}
+                                  <ShoppingBag size={9} className="shrink-0" />
+                                  <span className="truncate">{img.product.name}</span>
                                 </Link>
                               )}
                               {img.product?.product_code && (
-                                <span className="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded flex items-center gap-1 font-mono font-black">
-                                  <Hash size={10} /> {img.product.product_code}
+                                <span className="text-[9px] bg-slate-100 text-slate-400 px-1 py-0.5 rounded flex items-center gap-0.5 font-mono font-black shrink-0">
+                                  <Hash size={8} />{img.product.product_code}
                                 </span>
                               )}
                             </div>
                         </div>
                       </td>
-                      {isAdmin && (
-                        <td className="px-10 py-7">
-                          <span className="text-xs font-bold text-slate-600 truncate block max-w-[160px]">{municipality?.name || '---'}</span>
-                        </td>
-                      )}
-                      <td className="px-10 py-7">
-                        <span className="text-xs font-bold text-slate-600 truncate block max-w-[160px]">{img.business?.name || '---'}</span>
+                      {/* 自治体 / 事業者 */}
+                      <td className="px-2 py-3 border-b border-slate-50/50 overflow-hidden">
+                        <div className="flex flex-col min-w-0">
+                          {isAdmin && <span className="text-[10px] font-bold text-slate-500 truncate">{municipality?.name || '---'}</span>}
+                          <span className={`text-[10px] font-bold truncate ${isAdmin ? 'text-slate-400' : 'text-slate-500'}`}>{img.business?.name || '---'}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-7 text-center">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-accent rounded-lg text-[11px] font-black border border-blue-100">
+                      {/* 商品数 */}
+                      <td className="px-2 py-3 text-center border-b border-slate-50/50">
+                        <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-md text-[10px] font-black border border-blue-100">
                           {img.business ? PRODUCTS.filter(p => p.business_id === img.business!.id).length : 0}
                         </span>
                       </td>
-                      <td className="px-6 py-7 text-center whitespace-nowrap">
-                        <span className="text-xs font-mono font-black text-slate-500 tracking-tighter">
-                          {new Date(img.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-                        </span>
-                      </td>
-                      <td className="px-6 py-7 text-center whitespace-nowrap">
-                        {img.product?.deadline ? (
-                          <div className="flex flex-col items-center">
-                            <span className={`text-xs font-mono font-black tracking-tighter ${new Date(img.product.deadline) < new Date() ? 'text-red-500' : 'text-slate-500'}`}>
-                              {new Date(img.product.deadline).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                      {/* 作成日 / 期限 */}
+                      <td className="px-2 py-3 text-center border-b border-slate-50/50">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-[10px] font-mono font-bold text-slate-500 whitespace-nowrap">
+                            {new Date(img.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                          </span>
+                          {img.product?.deadline ? (
+                            <span className={`text-[9px] font-mono font-black whitespace-nowrap ${deadlineDiff !== null && deadlineDiff < 0 ? 'text-red-500' : (deadlineDiff !== null && deadlineDiff <= 7 ? 'text-amber-500' : 'text-slate-400')}`}>
+                              期限 {new Date(img.product.deadline).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' })}
+                              {deadlineDiff !== null && deadlineDiff < 0 && <span className="ml-0.5">({Math.abs(deadlineDiff)}日超過)</span>}
+                              {deadlineDiff !== null && deadlineDiff >= 0 && deadlineDiff <= 7 && <span className="ml-0.5">(残{deadlineDiff}日)</span>}
                             </span>
-                            {(() => {
-                              const diff = Math.ceil((new Date(img.product!.deadline!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                              if (diff < 0) return <span className="text-[10px] font-black text-red-400 mt-0.5">{Math.abs(diff)}日超過</span>;
-                              if (diff <= 7) return <span className="text-[10px] font-black text-amber-500 mt-0.5">残り{diff}日</span>;
-                              return null;
-                            })()}
-                          </div>
-                        ) : <span className="text-[11px] font-black text-slate-200">---</span>}
+                          ) : <span className="text-[9px] text-slate-300">期限 ---</span>}
+                        </div>
                       </td>
-                      <td className="px-6 py-7 text-center">
-                        <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-black border border-slate-100">
+                      {/* 版 / 更新 */}
+                      <td className="px-2 py-3 text-center border-b border-slate-50/50">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-slate-50 text-slate-500 rounded text-[9px] font-black border border-slate-100">
                             V{img.versions.length}
-                        </div>
-                      </td>
-                      <td className="px-6 py-7 text-center whitespace-nowrap">
-                        <div className="flex flex-col items-center">
-                          <span className="text-xs font-mono font-black text-slate-500 tracking-tighter">
-                            {updateDate.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/')}
                           </span>
-                          <span className="text-[11px] font-mono text-slate-300 font-bold">
-                            {updateDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                          <span className="text-[9px] font-mono text-slate-400 whitespace-nowrap">
+                            {updateDate.toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' })} {updateDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-7 text-center">
-                        {img.external_url ? (
-                          <a href={img.external_url} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-accent transition-colors block p-2">
-                            <ExternalLink size={18} className="mx-auto" />
-                          </a>
-                        ) : <span className="text-[11px] font-black text-slate-100">---</span>}
+                      {/* 操作 / ステータス */}
+                      <td className="px-2 py-3 border-b border-slate-50/50">
+                        <div className="flex items-center gap-1.5 justify-center flex-nowrap">
+                          <StatusBadge status={img.latestVersion.status} />
+                          {img.external_url ? (
+                            <a href={img.external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-blue-50 hover:text-accent rounded-md transition-all border border-slate-100 whitespace-nowrap">
+                              <ExternalLink size={10} />
+                              URL
+                            </a>
+                          ) : (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-300 bg-slate-50 rounded-md border border-slate-100 cursor-default whitespace-nowrap">
+                              <ExternalLink size={10} />
+                              URL
+                            </span>
+                          )}
+                          <button onClick={(e) => downloadImage(img.latestVersion.file_path, img.title, e)} className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-blue-50 hover:text-accent rounded-md transition-all border border-slate-100 whitespace-nowrap">
+                            <Download size={10} />
+                            保存
+                          </button>
+                        </div>
                       </td>
-                      <td className="px-6 py-7 text-center">
-                        <button onClick={(e) => downloadImage(img.latestVersion.file_path, img.title, e)} className="text-slate-200 hover:text-accent transition-colors block p-2 w-full">
-                          <Download size={18} className="mx-auto" />
-                        </button>
-                      </td>
-                      <td className="px-8 py-7 text-center"><StatusBadge status={img.latestVersion.status} /></td>
-                      <td className="px-10 py-7 text-right">
-                        <Link to={`${basePath}/revisions/${img.id}`} className="inline-flex items-center justify-center w-11 h-11 bg-blue-50 text-accent rounded-2xl hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn">
-                          <ArrowRight size={20} className="group-hover/btn:translate-x-0.5 transition-transform" />
+                      {/* 詳細 */}
+                      <td className="px-1 py-3 text-center border-b border-slate-50/50">
+                        <Link to={`${basePath}/revisions/${img.id}`} className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-lg hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn">
+                          <ArrowRight size={12} className="group-hover/btn:translate-x-0.5 transition-transform" />
                         </Link>
                       </td>
                     </tr>
@@ -462,14 +471,14 @@ export const ImageList: React.FC = () => {
       </div>
 
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-10 duration-500">
-          <div className="bg-slate-900 text-white shadow-2xl px-10 py-5 rounded-[2.5rem] flex items-center gap-10 ring-1 ring-white/10 backdrop-blur-md bg-opacity-95">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center font-black text-sm">{selectedIds.size}</div>
-              <p className="text-xs font-black whitespace-nowrap uppercase tracking-widest opacity-80">Items Selected</p>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-10 duration-500">
+          <div className="bg-slate-900 text-white shadow-2xl px-6 py-3.5 rounded-2xl flex items-center gap-6 ring-1 ring-white/10 backdrop-blur-md bg-opacity-95">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-accent text-white rounded-lg flex items-center justify-center font-black text-[11px]">{selectedIds.size}</div>
+              <p className="text-[10px] font-black whitespace-nowrap uppercase tracking-widest opacity-80">件選択中</p>
             </div>
-            <button onClick={handleBulkApprove} className="flex items-center gap-3 px-10 py-3.5 bg-accent text-white rounded-2xl font-black text-sm hover:bg-sky-500 transition-all active:scale-95 group">
-              <CheckCircle2 size={20} /> 選択した案件を一括承認
+            <button onClick={handleBulkApprove} className="flex items-center gap-2 px-6 py-2.5 bg-accent text-white rounded-xl font-black text-[11px] hover:bg-sky-500 transition-all active:scale-95 group">
+              <CheckCircle2 size={16} /> 一括承認
             </button>
           </div>
         </div>
@@ -516,9 +525,9 @@ export const ImageList: React.FC = () => {
                     ローカルファイル名を記載した場合は、画像ファイルも同時に選択してください。
                   </p>
                   
-                  <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-100">
+                  <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-100 w-full max-w-2xl">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">CSV推奨フォーマット (6列)</p>
-                      <code className="text-[10px] font-mono font-bold text-slate-600 block bg-white p-3 rounded-xl border border-slate-100 leading-relaxed shadow-inner">
+                      <code className="text-[10px] font-mono font-bold text-slate-600 block bg-white p-3 rounded-xl border border-slate-100 shadow-inner whitespace-nowrap overflow-hidden">
                         商品名, 事業者ID, 案件タイトル, 外部リンクURL, 寄付金額, <span className="text-accent">画像ソース(URL or ファイル名)</span>
                       </code>
                   </div>

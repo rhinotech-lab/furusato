@@ -92,34 +92,36 @@ export const ImageUpload: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-700">
+    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-2xl shadow-sm border border-slate-100 transition-all active:scale-90">
-          <ArrowLeft size={20} />
+        <button onClick={() => navigate(-1)} className="p-2 bg-white text-slate-400 hover:text-slate-900 rounded-xl shadow-sm border border-slate-100 transition-all active:scale-90">
+          <ArrowLeft size={16} />
         </button>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tighter">新規画像登録</h1>
+        <div>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">新規画像登録</h1>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-8">
-          <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-premium border border-slate-100 overflow-hidden">
             <div className="flex border-b border-slate-50">
-                <div className={`flex-1 p-5 text-center font-black text-xs uppercase tracking-widest ${step === 1 ? 'text-accent bg-blue-50/50' : 'text-slate-300'}`}>
+                <div className={`flex-1 p-3 text-center font-bold text-[10px] uppercase tracking-widest ${step === 1 ? 'text-accent bg-blue-50/50' : 'text-slate-300'}`}>
                     1. 商品選択
                 </div>
-                <div className={`flex-1 p-5 text-center font-black text-xs uppercase tracking-widest ${step === 2 ? 'text-accent bg-blue-50/50' : 'text-slate-300'}`}>
+                <div className={`flex-1 p-3 text-center font-bold text-[10px] uppercase tracking-widest ${step === 2 ? 'text-accent bg-blue-50/50' : 'text-slate-300'}`}>
                     2. 画像アップロード
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-8 lg:p-10">
+            <form onSubmit={handleSubmit} className="p-6">
                 {step === 1 && (
                     <div className="space-y-6 max-w-lg mx-auto">
                         {currentUser?.role !== 'municipality_user' && (
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">自治体</label>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">自治体</label>
                                 <select
-                                    className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl outline-none font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-accent/5 transition-all appearance-none cursor-pointer"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all appearance-none cursor-pointer"
                                     value={selectedMunicipalityId}
                                     onChange={e => {
                                         setSelectedMunicipalityId(e.target.value);
@@ -135,10 +137,10 @@ export const ImageUpload: React.FC = () => {
                             </div>
                         )}
                         
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">事業者</label>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">事業者</label>
                             <select
-                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl outline-none font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-accent/5 transition-all appearance-none cursor-pointer disabled:opacity-50"
+                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all appearance-none cursor-pointer disabled:opacity-50"
                                 value={selectedBusinessId}
                                 disabled={!selectedMunicipalityId}
                                 onChange={e => {
@@ -153,10 +155,10 @@ export const ImageUpload: React.FC = () => {
                             </select>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">商品</label>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">商品</label>
                             <select
-                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl outline-none font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-accent/5 transition-all appearance-none cursor-pointer disabled:opacity-50"
+                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all appearance-none cursor-pointer disabled:opacity-50"
                                 value={selectedProductId}
                                 disabled={!selectedBusinessId}
                                 onChange={e => setSelectedProductId(e.target.value)}
@@ -173,7 +175,7 @@ export const ImageUpload: React.FC = () => {
                                 type="button"
                                 disabled={!selectedProductId}
                                 onClick={() => setStep(2)}
-                                className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-xl active:scale-95"
+                                className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-lg active:scale-95"
                             >
                                 次へ進む
                             </button>
@@ -182,34 +184,34 @@ export const ImageUpload: React.FC = () => {
                 )}
 
                 {step === 2 && (
-                    <div className="space-y-8">
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">画像タイトル</label>
+                    <div className="space-y-6">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">画像タイトル</label>
                             <input
                                 type="text"
                                 required
                                 placeholder="例: メインバナー、正方形サムネイルなど"
-                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl outline-none font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-accent/5 transition-all"
+                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all"
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
-                                <LinkIcon size={12} /> 外部リンクURL <span className="text-[9px] font-medium opacity-40 ml-1">(任意)</span>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-1.5">
+                                <LinkIcon size={10} /> 外部リンクURL <span className="text-[9px] font-medium opacity-40 ml-1">(任意)</span>
                             </label>
                             <input
                                 type="url"
                                 placeholder="https://item.rakuten.co.jp/..."
-                                className="w-full px-5 py-3.5 bg-slate-50 border-0 rounded-2xl outline-none font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-accent/5 transition-all"
+                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all"
                                 value={externalUrl}
                                 onChange={e => setExternalUrl(e.target.value)}
                             />
                         </div>
 
                         <div 
-                            className={`border-2 border-dashed rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center transition-all cursor-pointer bg-slate-50/50 ${
+                            className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer bg-slate-50/50 ${
                                 isDragging ? 'border-accent bg-blue-50/50' : 'border-slate-200 hover:border-slate-400 hover:bg-slate-50'
                             }`}
                             onDragOver={handleDragOver}
@@ -219,12 +221,12 @@ export const ImageUpload: React.FC = () => {
                         >
                             {!file ? (
                                 <>
-                                    <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center mb-6 text-slate-300 shadow-sm border border-slate-100">
-                                        <UploadCloud size={36} />
+                                    <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-4 text-slate-300 shadow-sm border border-slate-100">
+                                        <UploadCloud size={24} />
                                     </div>
-                                    <p className="font-black text-slate-900 text-base">クリックしてアップロード</p>
-                                    <p className="text-sm text-slate-400 font-bold mt-2">またはドラッグ＆ドロップ</p>
-                                    <p className="text-[10px] text-slate-300 font-black uppercase tracking-widest mt-6">PNG, JPG up to 10MB</p>
+                                    <p className="font-bold text-slate-900 text-sm">クリックしてアップロード</p>
+                                    <p className="text-[11px] text-slate-400 font-bold mt-1">またはドラッグ＆ドロップ</p>
+                                    <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest mt-4">PNG, JPG up to 10MB</p>
                                     <input 
                                         id="file-upload" 
                                         type="file" 
@@ -235,16 +237,16 @@ export const ImageUpload: React.FC = () => {
                                 </>
                             ) : (
                                 <div className="relative group w-full max-w-md animate-in zoom-in duration-300">
-                                    <img src={previewUrl!} alt="Preview" className="w-full h-auto rounded-3xl shadow-2xl max-h-[400px] object-contain bg-checkered ring-8 ring-white" />
+                                    <img src={previewUrl!} alt="Preview" className="w-full h-auto rounded-xl shadow-xl max-h-[300px] object-contain bg-checkered ring-4 ring-white" />
                                     <button 
                                         type="button"
                                         onClick={(e) => { e.stopPropagation(); setFile(null); setPreviewUrl(null); }}
-                                        className="absolute -top-4 -right-4 p-3 bg-rose-500 text-white rounded-2xl shadow-xl hover:bg-rose-600 transition-all border-4 border-white active:scale-90"
+                                        className="absolute -top-3 -right-3 p-2 bg-rose-500 text-white rounded-xl shadow-lg hover:bg-rose-600 transition-all border-2 border-white active:scale-90"
                                     >
-                                        <X size={20} strokeWidth={3} />
+                                        <X size={14} strokeWidth={3} />
                                     </button>
-                                    <div className="mt-6 flex items-center justify-center gap-3 text-xs font-black text-slate-400">
-                                        <FileImage size={18} />
+                                    <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-bold text-slate-400">
+                                        <FileImage size={14} />
                                         <span>{file.name}</span>
                                         <span className="text-slate-200">/</span>
                                         <span>{(file.size / 1024).toFixed(0)} KB</span>
@@ -264,7 +266,7 @@ export const ImageUpload: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={!file || !title}
-                                className="px-10 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-xl active:scale-95 font-black text-sm"
+                                className="px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-lg active:scale-95 font-bold text-[11px]"
                             >
                                 画像を登録する
                             </button>
@@ -277,34 +279,34 @@ export const ImageUpload: React.FC = () => {
 
         {/* AI Insight Widget */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/20 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-indigo-600/40"></div>
-            <div className="relative z-10 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-indigo-400">
-                  <Brain size={24} />
+          <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-600/20 rounded-full blur-3xl -mr-12 -mt-12 transition-all group-hover:bg-indigo-600/40"></div>
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-indigo-400">
+                  <Brain size={16} />
                 </div>
                 <div>
-                  <h3 className="font-black text-base tracking-tight leading-none mb-1">AI 提出前チェック</h3>
-                  <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Powered by Insight AI</p>
+                  <h3 className="font-bold text-[12px] tracking-tight leading-none mb-0.5">AI 提出前チェック</h3>
+                  <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest">Powered by Insight AI</p>
                 </div>
               </div>
 
               {!municipalityInsight ? (
-                <div className="py-10 text-center space-y-4">
-                  <div className="w-12 h-12 border-4 border-white/5 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
-                  <p className="text-[11px] font-bold text-white/30">自治体を選択してください...</p>
+                <div className="py-6 text-center space-y-3">
+                  <div className="w-8 h-8 border-2 border-white/5 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
+                  <p className="text-[10px] font-bold text-white/30">自治体を選択してください...</p>
                 </div>
               ) : (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="p-3 bg-white/5 rounded-xl border border-white/5">
                     <div className="flex items-center gap-2 mb-2">
                       <ThumbsUp size={14} className="text-emerald-400" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Success Tip</span>
                     </div>
                     <p className="text-xs font-bold leading-relaxed">{municipalityInsight.tip}</p>
                   </div>
-                  <div className="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/20">
+                  <div className="p-3 bg-rose-500/10 rounded-xl border border-rose-500/20">
                     <div className="flex items-center gap-2 mb-2">
                       <AlertTriangle size={14} className="text-rose-400" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">Rejection Risk</span>
@@ -316,11 +318,11 @@ export const ImageUpload: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-premium">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-              <Sparkles size={14} /> 制作ガイドライン
+          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-premium">
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+              <Sparkles size={12} /> 制作ガイドライン
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
                 { label: '配色', text: '自治体指定のアクセントカラーを30%以上使用' },
                 { label: '文字', text: '寄付金額は白枠+黒影で視認性を確保' },

@@ -1,14 +1,44 @@
 # クイックスタートガイド
 
-## ファイル整理の実行
+## ローカル開発環境の起動
+
+### 1. バックエンド（Docker Compose）
 
 ```bash
-# 整理スクリプトを実行
-chmod +x scripts/organize.sh
-./scripts/organize.sh
+# Docker Composeで起動
+docker compose up --build -d
+
+# Laravelの初期設定
+docker compose exec backend composer install
+docker compose exec backend php artisan key:generate
+docker compose exec backend bash -c "chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache"
+docker compose exec backend php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+docker compose exec backend php artisan migrate
+docker compose exec backend php artisan db:seed
 ```
 
-## 整理後の使用方法
+### 2. フロントエンド
+
+```bash
+npm install
+npm run dev
+```
+
+### 3. アクセス
+
+- フロントエンド: http://localhost:3000
+- バックエンドAPI: http://localhost:8080/api
+
+### 4. ログイン
+
+| ロール | メールアドレス | パスワード |
+|---|---|---|
+| 管理者 | admin@example.com | password |
+| 制作者 | creator@example.com | password |
+| 自治体ユーザー | municipality@example.com | password |
+| 事業者ユーザー | business@example.com | password |
+
+## GCP本番環境のセットアップ
 
 ### セットアップ
 ```bash

@@ -74,14 +74,9 @@ export const AlertList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-700 h-full flex flex-col">
+    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
       <div className="flex justify-between items-end shrink-0">
         <div className="flex flex-col min-w-0">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-              <Link to={basePath} className="hover:text-slate-900 transition-colors">ホーム</Link>
-              <ChevronRight size={10} className="mx-1 opacity-50" />
-              <span>要対応案件</span>
-          </div>
           <h1 className="text-xl font-black text-slate-900 tracking-tighter flex items-center gap-2">
               <AlertTriangle className="text-rose-500" size={20} />
               要対応案件

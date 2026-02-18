@@ -66,3 +66,9 @@ scripts/
 - すべてのスクリプトはWSL環境で実行してください
 - プロジェクトIDは `redhorse-prod` がデフォルトです
 - 実行前に `gcloud auth login` で認証してください
+
+## 関連ドキュメント
+
+- [本番環境構築手順](../doc/PRODUCTION.md)
+- [セットアップ完了状況](../doc/PRODUCTION_STATUS.md)
+- [WSL環境セットアップ](../doc/WSL_SETUP.md)

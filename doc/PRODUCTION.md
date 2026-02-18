@@ -4,11 +4,24 @@
 ストレージは Cloud Storage、DB は MySQL（Cloud SQL）を使用します。
 
 ## 全体構成
-- ソース管理: GitHub
-- CI/CD: Cloud Build（GitHub 連携トリガー）
-- 実行環境: Cloud Run
-- DB: Cloud SQL for MySQL
-- ストレージ: Cloud Storage
+
+| 項目 | サービス |
+|---|---|
+| ソース管理 | GitHub |
+| CI/CD | Cloud Build（GitHub 連携トリガー） |
+| 実行環境 | Cloud Run |
+| DB | Cloud SQL for MySQL 8.0 |
+| ストレージ | Cloud Storage |
+| 認証 | Laravel Sanctum |
+
+## アプリケーション構成
+
+| コンポーネント | 技術 | 説明 |
+|---|---|---|
+| フロントエンド | React 19 + Vite 6 | SPA（静的ビルド） |
+| バックエンド | Laravel 12 (PHP 8.3) | REST API |
+| データベース | MySQL 8.0 | Cloud SQL |
+| Webサーバー | Nginx | リバースプロキシ |
 
 ## 前提
 - GCP プロジェクトが作成済み
@@ -30,7 +43,7 @@ Cloud Build で作成したイメージを保存するリポジトリを作成�
 
 ## 3. Cloud SQL（MySQL）を作成
 MySQL インスタンスを作成し、アプリ用の DB とユーザーを準備します。
-- バージョン: MySQL 8.x
+- バージョン: MySQL 8.0
 - インスタンス名例: `app-mysql`
 - DB 名例: `app_db`
 - ユーザー名例: `app_user`
@@ -49,11 +62,16 @@ Cloud Run のサービスを作成します（後で Cloud Build からデプロ
 
 ## 6. 環境変数の設定
 Cloud Run に以下の環境変数を設定します。
-- `DB_HOST`（Cloud SQL 接続用）
-- `DB_NAME`
-- `DB_USER`
-- `DB_PASSWORD`
-- `GCS_BUCKET`
+
+| 環境変数 | 説明 |
+|---|---|
+| `APP_KEY` | Laravelアプリケーションキー |
+| `APP_ENV` | `production` |
+| `DB_HOST` | Cloud SQL 接続名 |
+| `DB_NAME` | データベース名 |
+| `DB_USER` | データベースユーザー |
+| `DB_PASSWORD` | データベースパスワード |
+| `GCS_BUCKET` | Cloud Storage バケット名 |
 
 ※ Cloud SQL への接続は「Cloud SQL 接続」からインスタンスを紐付けます。
 
@@ -71,11 +89,6 @@ GitHub の `main` ブランチへの push で自動ビルド・デプロイさ�
    - Artifact Registry へ push
    - Cloud Run へデプロイ
 
-`cloudbuild.yaml` の例（概略）:
-- `docker build`
-- `docker push`
-- `gcloud run deploy`
-
 ## 8. リリースフロー
 1. GitHub の `main` に push
 2. Cloud Build が自動的に起動
@@ -85,4 +98,4 @@ GitHub の `main` ブランチへの push で自動ビルド・デプロイさ�
 - 環境変数に秘密情報を置く場合は Secret Manager を推奨
 - Cloud SQL への接続は Cloud Run からのプライベート接続を推奨
 - バケットの権限は最小権限を適用
-
+- 本番環境では `APP_DEBUG=false` に設定すること

@@ -66,25 +66,22 @@ export const ImageCollection: React.FC = () => {
   const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : '/admin';
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col px-2">
+    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
       <div className="flex justify-between items-end shrink-0">
         <div className="flex flex-col">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-              <span>アセットマネージャー</span>
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tighter">素材回収状況</h1>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">素材回収状況</h1>
         </div>
         
-        <div className="flex gap-4">
-            <div className="flex items-center gap-6 bg-white px-6 py-3 rounded-2xl shadow-premium border border-slate-100">
+        <div className="flex gap-3">
+            <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl shadow-premium border border-slate-100">
                 <div className="text-center">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">未回収</p>
-                    <p className="text-lg font-black text-rose-500 leading-none">{stats.pending}</p>
+                    <p className="text-[15px] font-black text-rose-500 leading-none">{stats.pending}</p>
                 </div>
-                <div className="w-px h-8 bg-slate-100"></div>
+                <div className="w-px h-6 bg-slate-100"></div>
                 <div className="text-center">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">完了</p>
-                    <p className="text-lg font-black text-emerald-500 leading-none">{stats.received}</p>
+                    <p className="text-[15px] font-black text-emerald-500 leading-none">{stats.received}</p>
                 </div>
             </div>
         </div>
@@ -127,64 +124,61 @@ export const ImageCollection: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
+      <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
         <div className="overflow-auto scrollbar-hide flex-1">
-          <table className="w-full text-left border-separate border-spacing-0">
+          <table className="w-full text-left min-w-[700px] border-separate border-spacing-0">
             <thead className="sticky top-0 z-20">
-              <tr className="bg-slate-50/80 backdrop-blur-md text-slate-400">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">ステータス</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">対象商品 / 事業者</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100">素材提供</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100">最終更新</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest w-12 border-b border-slate-100 text-center">操作</th>
+              <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-28">ステータス</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">対象商品 / 事業者</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-24">素材提供</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-28">最終更新</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest w-28 border-b border-slate-100 text-center">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {collectionList.length === 0 ? (
-                  <tr><td colSpan={5} className="px-8 py-20 text-center text-slate-300 font-black">対象の返礼品はありません</td></tr>
+                  <tr><td colSpan={5} className="px-8 py-10 text-center text-slate-300 font-bold">対象の返礼品はありません</td></tr>
               ) : collectionList.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                  <td className="px-8 py-6">
+                <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                  <td className="px-6 py-4 border-b border-slate-50/50">
                     {item.isReceived ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black border border-emerald-100 uppercase tracking-widest">
-                            <CheckCircle2 size={12} /> 回収済み
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[9px] font-black border border-emerald-100">
+                            <CheckCircle2 size={10} /> 回収済み
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black border border-rose-100 uppercase tracking-widest animate-pulse">
-                            <Clock size={12} /> 未提出
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-600 rounded text-[9px] font-black border border-rose-100 animate-pulse">
+                            <Clock size={10} /> 未提出
                         </span>
                     )}
                   </td>
-                  <td className="px-8 py-6">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-900 text-[14px] tracking-tight">{item.name}</span>
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">{item.business?.name}</span>
+                  <td className="px-6 py-4 border-b border-slate-50/50">
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-bold text-slate-900 text-[14px] truncate">{item.name}</span>
+                      <span className="text-[10px] text-slate-400 font-bold mt-0.5">{item.business?.name}</span>
                     </div>
                   </td>
-                  <td className="px-8 py-6 text-center">
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-black uppercase border ${item.has_materials ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-slate-50 text-slate-300 border-slate-100'}`}>
-                        {item.has_materials ? '提供あり設定' : '提供なし'}
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-black border ${item.has_materials ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-slate-50 text-slate-300 border-slate-100'}`}>
+                        {item.has_materials ? '提供あり' : '提供なし'}
                     </div>
                   </td>
-                  <td className="px-8 py-6 text-center">
-                    <span className="text-[11px] font-mono font-bold text-slate-400">
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <span className="text-[10px] font-mono font-bold text-slate-400">
                         {item.lastUpdate ? new Date(item.lastUpdate).toLocaleDateString('ja-JP') : '---'}
                     </span>
                   </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <div className="flex items-center justify-center gap-1.5">
                         {!item.isReceived ? (
-                            <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl font-bold text-[10px] hover:bg-slate-800 transition-all shadow-md active:scale-95 whitespace-nowrap">
-                                <UploadCloud size={14} /> 素材を登録
+                            <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-xl font-bold text-[11px] hover:bg-slate-800 transition-all shadow-md active:scale-95 whitespace-nowrap">
+                                <UploadCloud size={12} /> 素材登録
                             </button>
                         ) : (
-                            <Link to={`${basePath}/images?productId=${item.id}`} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] hover:bg-slate-50 transition-all shadow-sm">
-                                <FileCheck size={14} /> 案件を確認
+                            <Link to={`${basePath}/images?productId=${item.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap">
+                                <FileCheck size={12} /> 案件確認
                             </Link>
                         )}
-                        <button className="p-2 text-slate-200 hover:text-slate-600 transition-colors">
-                            <MoreVertical size={16} />
-                        </button>
                     </div>
                   </td>
                 </tr>
@@ -194,17 +188,17 @@ export const ImageCollection: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-slate-900 rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl shrink-0">
-          <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-accent">
-                  <Mail size={32} />
+      <div className="bg-slate-900 rounded-[1.5rem] p-5 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xl shrink-0">
+          <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-accent">
+                  <Mail size={18} />
               </div>
-              <div className="space-y-1">
-                  <h3 className="text-xl font-black tracking-tight leading-none mb-1">未提出事業者へ一括催促</h3>
-                  <p className="text-xs text-white/40 font-medium">現在、素材未提出の事業者が {stats.pending} 社あります。期日に合わせた自動リマインドを送信できます。</p>
+              <div className="space-y-0.5">
+                  <h3 className="text-[14px] font-black tracking-tight leading-none">未提出事業者へ一括催促</h3>
+                  <p className="text-[11px] text-white/40 font-medium">素材未提出の事業者が {stats.pending} 社あります。</p>
               </div>
           </div>
-          <button className="px-10 py-4 bg-accent text-white rounded-2xl font-black text-sm shadow-xl active:scale-95 transition-all">
+          <button className="px-6 py-2.5 bg-accent text-white rounded-xl font-bold text-[11px] shadow-xl active:scale-95 transition-all whitespace-nowrap">
               催促メールを送信
           </button>
       </div>

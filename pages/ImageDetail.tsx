@@ -51,6 +51,9 @@ export const ImageDetail: React.FC = () => {
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [compareVersionAId, setCompareVersionAId] = useState<number | null>(null);
+  const [compareVersionBId, setCompareVersionBId] = useState<number | null>(null);
 
   const isBusinessUser = currentUser?.role === 'business_user';
 
@@ -86,6 +89,19 @@ export const ImageDetail: React.FC = () => {
   const product = mockDb.getProductById(image.product_id);
   const business = product ? mockDb.getBusinessById(product.business_id) : null;
   const currentVersion = image.versions.find(v => v.id === selectedVersionId) || image.versions[image.versions.length - 1];
+  const compareVersionA = isCompareMode ? image.versions.find(v => v.id === compareVersionAId) : null;
+  const compareVersionB = isCompareMode ? image.versions.find(v => v.id === compareVersionBId) : null;
+
+  const toggleCompareMode = () => {
+    if (!isCompareMode && image.versions.length >= 2) {
+      // デフォルト: A = 最新版, B = 1つ前のバージョン
+      setCompareVersionAId(image.versions[image.versions.length - 1].id);
+      setCompareVersionBId(image.versions[image.versions.length - 2].id);
+      setIsCompareMode(true);
+    } else {
+      setIsCompareMode(false);
+    }
+  };
 
   const handleSendMessage = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -218,6 +234,18 @@ export const ImageDetail: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
+              {image.versions.length >= 2 && (
+                <button 
+                  onClick={toggleCompareMode}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-[10px] transition-all shadow-sm active:scale-95 ${
+                    isCompareMode 
+                      ? 'bg-accent text-white shadow-lg shadow-accent/20' 
+                      : 'bg-white border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <LayoutGrid size={14} /> A/B 比較
+                </button>
+              )}
               <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl font-bold text-[10px] hover:bg-slate-50 transition-all shadow-sm active:scale-95">
                 <Download size={14} /> 保存
               </button>
@@ -260,7 +288,86 @@ export const ImageDetail: React.FC = () => {
         </div>
 
         {/* プレビューエリア */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8 bg-checkered relative overflow-hidden">
+        {isCompareMode && compareVersionA && compareVersionB ? (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* A/B バージョン選択バー */}
+            <div className="bg-white border-b border-slate-100 px-8 py-2 flex items-center gap-6 shrink-0">
+              <div className="flex items-center gap-2 flex-1">
+                <span className="w-6 h-6 rounded-lg bg-blue-500 text-white flex items-center justify-center text-[10px] font-black shadow-sm">A</span>
+                <select
+                  value={compareVersionAId ?? ''}
+                  onChange={(e) => setCompareVersionAId(Number(e.target.value))}
+                  className="bg-slate-50 border-0 rounded-lg px-3 py-1.5 text-[11px] font-bold outline-none cursor-pointer focus:bg-white transition-all flex-1"
+                >
+                  {image.versions.map(v => (
+                    <option key={v.id} value={v.id}>V{v.version_number} — {STATUS_LABELS[v.status]}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest">vs</div>
+              <div className="flex items-center gap-2 flex-1">
+                <span className="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-[10px] font-black shadow-sm">B</span>
+                <select
+                  value={compareVersionBId ?? ''}
+                  onChange={(e) => setCompareVersionBId(Number(e.target.value))}
+                  className="bg-slate-50 border-0 rounded-lg px-3 py-1.5 text-[11px] font-bold outline-none cursor-pointer focus:bg-white transition-all flex-1"
+                >
+                  {image.versions.map(v => (
+                    <option key={v.id} value={v.id}>V{v.version_number} — {STATUS_LABELS[v.status]}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* A/B 比較ビュー */}
+            <div className="flex-1 flex bg-checkered relative overflow-hidden">
+              {/* A パネル */}
+              <div className="flex-1 flex flex-col items-center justify-center p-6 border-r border-slate-200 relative">
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="w-7 h-7 rounded-lg bg-blue-500 text-white flex items-center justify-center text-[11px] font-black shadow-lg">A</span>
+                </div>
+                <div 
+                  className="relative shadow-xl bg-white p-0.5 cursor-zoom-in group/imgA border border-slate-200/50"
+                  onClick={() => { setSelectedVersionId(compareVersionA.id); setIsZoomOpen(true); }}
+                >
+                  <img src={compareVersionA.file_path} alt="Version A" className="max-w-full max-h-[55vh] object-contain" />
+                  <div className="absolute top-3 right-3 shadow-lg"><StatusBadge status={compareVersionA.status} /></div>
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/imgA:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur p-3 rounded-full shadow-xl">
+                      <Maximize2 size={18} className="text-slate-900" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 bg-blue-500/80 backdrop-blur text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-lg">
+                  Version {compareVersionA.version_number}
+                </div>
+              </div>
+
+              {/* B パネル */}
+              <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-[11px] font-black shadow-lg">B</span>
+                </div>
+                <div 
+                  className="relative shadow-xl bg-white p-0.5 cursor-zoom-in group/imgB border border-slate-200/50"
+                  onClick={() => { setSelectedVersionId(compareVersionB.id); setIsZoomOpen(true); }}
+                >
+                  <img src={compareVersionB.file_path} alt="Version B" className="max-w-full max-h-[55vh] object-contain" />
+                  <div className="absolute top-3 right-3 shadow-lg"><StatusBadge status={compareVersionB.status} /></div>
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/imgB:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur p-3 rounded-full shadow-xl">
+                      <Maximize2 size={18} className="text-slate-900" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 bg-emerald-500/80 backdrop-blur text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-lg">
+                  Version {compareVersionB.version_number}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-checkered relative overflow-hidden">
             <div 
               className="relative shadow-2xl bg-white p-0.5 animate-in zoom-in duration-500 cursor-zoom-in group/img border border-slate-200/50"
               onClick={() => setIsZoomOpen(true)}
@@ -277,7 +384,8 @@ export const ImageDetail: React.FC = () => {
             <div className="mt-4 bg-slate-900/80 backdrop-blur text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-xl border border-white/10">
                 Viewing Version {currentVersion.version_number}
             </div>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Column 4: メッセージ */}

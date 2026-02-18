@@ -60,13 +60,10 @@ export const ImageRevisionList: React.FC = () => {
   const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : currentUser?.role === 'business_user' ? '/business' : '/admin';
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col px-2">
+    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
       <div className="flex justify-between items-end shrink-0">
         <div className="flex flex-col">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-              <span>リビジョン管理</span>
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tighter">画像改修状況</h1>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">画像改修状況</h1>
         </div>
         
         <div className="flex gap-3">
@@ -127,50 +124,50 @@ export const ImageRevisionList: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
+      <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
         <div className="overflow-auto scrollbar-hide flex-1">
-          <table className="w-full text-left border-separate border-spacing-0">
+          <table className="w-full text-left min-w-[700px] border-separate border-spacing-0">
             <thead className="sticky top-0 z-20">
-              <tr className="bg-slate-50/80 backdrop-blur-md text-slate-400">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">最新ステータス</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">案件タイトル / 商品</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100">版数</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100">最終更新</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest w-12 border-b border-slate-100 text-center">操作</th>
+              <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-32">最新ステータス</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">案件タイトル / 商品</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-20">版数</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-28">最終更新</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest w-24 border-b border-slate-100 text-center">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {revisionList.length === 0 ? (
-                  <tr><td colSpan={5} className="px-8 py-20 text-center text-slate-300 font-black">該当する改修案件はありません</td></tr>
+                  <tr><td colSpan={5} className="px-8 py-10 text-center text-slate-300 font-bold">該当する改修案件はありません</td></tr>
               ) : revisionList.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                  <td className="px-8 py-6">
+                <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                  <td className="px-6 py-4 border-b border-slate-50/50">
                     <StatusBadge status={item.latestVer.status} />
                   </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-10 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                  <td className="px-6 py-4 border-b border-slate-50/50">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 shrink-0">
                             <img src={item.latestVer.file_path} className="w-full h-full object-cover" alt="" />
                         </div>
                         <div className="flex flex-col min-w-0">
                             <span className="font-bold text-slate-900 text-[14px] truncate">{item.title}</span>
-                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1 truncate">{item.product?.name}</span>
+                            <span className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">{item.product?.name}</span>
                         </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6 text-center">
-                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-black border border-slate-100">
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <div className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-slate-50 text-slate-500 rounded text-[9px] font-black border border-slate-100">
                         V{item.versions.length}
                     </div>
                   </td>
-                  <td className="px-8 py-6 text-center">
-                    <span className="text-[11px] font-mono font-bold text-slate-400">
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <span className="text-[10px] font-mono font-bold text-slate-400">
                         {new Date(item.latestVer.created_at).toLocaleDateString('ja-JP')}
                     </span>
                   </td>
-                  <td className="px-8 py-6 text-right">
-                    <Link to={`${basePath}/revisions/${item.id}`} className="inline-flex items-center justify-center w-10 h-10 bg-blue-50 text-accent rounded-xl hover:bg-accent hover:text-white transition-all shadow-sm">
-                        <ArrowRight size={18} strokeWidth={3} />
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <Link to={`${basePath}/revisions/${item.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap">
+                        詳細 <ArrowRight size={12} />
                     </Link>
                   </td>
                 </tr>

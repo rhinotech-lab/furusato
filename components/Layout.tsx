@@ -104,12 +104,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className={`p-6 pb-4 transition-all duration-300 ${isCollapsed ? 'p-4 text-center' : 'text-left'} shrink-0 relative`}>
             <div className={`flex flex-col ${isCollapsed ? 'items-center' : ''}`}>
               {!isCollapsed ? (
-                <>
-                  <span className={`${theme.logo} text-[9px] font-black tracking-[0.2em] mb-1 uppercase`}>Furusato Tax</span>
-                  <h1 className={`text-lg font-black tracking-tighter ${theme.text} leading-tight whitespace-nowrap`}>制作管理システム</h1>
-                </>
+                <h1 className="whitespace-nowrap leading-snug">
+                  <span className="block text-[15px] font-black tracking-tight text-sky-400">ふるさと納税</span>
+                  <span className="block text-[15px] font-black tracking-tight text-sky-400">制作管理システム</span>
+                </h1>
               ) : (
-                <div className={`${theme.logo} w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-black text-[10px]`}>
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-black text-[10px] text-sky-400">
                   ふる
                 </div>
               )}
@@ -182,7 +182,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F8FAFC]">
-        <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 h-14 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30 shrink-0">
+        <header className="bg-[#F8FAFC] border-b border-slate-100/50 h-14 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30 shrink-0">
           <button className="lg:hidden p-2 text-slate-400" onClick={() => setIsMobileMenuOpen(true)}><Menu size={18} /></button>
           <div className="flex-1 flex justify-end items-center gap-4">
             <Link to={`${basePath}/notifications`} className="p-2 text-slate-400 hover:text-slate-600 transition-all relative">
@@ -192,7 +192,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
         </header>
         <main className="flex-1 overflow-hidden flex flex-col">
-            <div className="flex-1 overflow-y-auto scrollbar-hide">
+            <div className="flex-1 overflow-y-auto scrollbar-hide px-8 lg:px-12 py-8">
                 {children}
             </div>
         </main>

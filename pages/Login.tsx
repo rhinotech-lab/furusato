@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { authenticateUser, MUNICIPALITIES, BUSINESSES } from '../services/mockDb';
 import { 
   LogIn, 
-  User as UserIcon, 
+  Mail, 
   Lock,
   AlertCircle
 } from 'lucide-react';
@@ -14,10 +13,30 @@ export const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [userId, setUserId] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const quickLogin = async (qEmail: string, pw: string) => {
+    setEmail(qEmail);
+    setPassword(pw);
+    setError('');
+    setIsLoading(true);
+    try {
+      await login(qEmail, pw);
+      // ログイン後、ロールに応じてリダイレクト
+      const loginInfo = JSON.parse(localStorage.getItem('furusato_last_login') || '{}');
+      const type = loginInfo.type || 'admin';
+      if (type === 'admin') navigate('/admin');
+      else if (type === 'municipality') navigate('/municipality');
+      else navigate('/business');
+    } catch (err: any) {
+      setError(err.message || 'ログインに失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,55 +44,14 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const id = parseInt(userId);
-      if (isNaN(id)) {
-        setError('IDは数値で入力してください');
-        setIsLoading(false);
-        return;
-      }
+      await login(email, password);
 
-      const user = authenticateUser(id, password);
-      if (!user) {
-        setError('IDまたはパスワードが正しくありません');
-        setIsLoading(false);
-        return;
-      }
-
-      // 役割に応じてタイプを判定
-      let type: 'admin' | 'municipality' | 'business' = 'admin';
-      if (user.role === 'municipality_user') {
-        type = 'municipality';
-      } else if (user.role === 'business_user') {
-        type = 'business';
-      } else if (user.role === 'super_admin' || user.role === 'creator') {
-        type = 'admin';
-      }
-
-      // ログイン情報を保存
-      const loginInfo = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        type: type,
-        municipality_id: user.municipality_id,
-        business_id: user.business_id,
-        municipality_name: user.municipality_id ? MUNICIPALITIES.find(m => m.id === user.municipality_id)?.name : null,
-        business_name: user.business_id ? BUSINESSES.find(b => b.id === user.business_id)?.name : null
-      };
-      localStorage.setItem('furusato_last_login', JSON.stringify(loginInfo));
-
-      // 認証処理
-      await login(userId, password);
-
-      // 役割に応じてリダイレクト
-      if (type === 'admin') {
-        navigate('/admin');
-      } else if (type === 'municipality') {
-        navigate('/municipality');
-      } else {
-        navigate('/business');
-      }
+      // ログイン後、保存されたユーザー情報からリダイレクト先を決定
+      const loginInfo = JSON.parse(localStorage.getItem('furusato_last_login') || '{}');
+      const type = loginInfo.type || 'admin';
+      if (type === 'admin') navigate('/admin');
+      else if (type === 'municipality') navigate('/municipality');
+      else navigate('/business');
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました');
     } finally {
@@ -106,7 +84,7 @@ export const Login: React.FC = () => {
             <div className="w-full max-w-md mx-auto md:mx-0">
               <div className="mb-10">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-3 italic">ログイン</h2>
-                <p className="text-[13px] text-slate-600 font-bold leading-relaxed">IDとパスワードを入力してください。</p>
+                <p className="text-[13px] text-slate-600 font-bold leading-relaxed">メールアドレスとパスワードを入力してください。</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -119,14 +97,14 @@ export const Login: React.FC = () => {
 
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                    <UserIcon size={14} />
-                    ID
+                    <Mail size={14} />
+                    メールアドレス
                   </label>
                   <input
-                    type="text"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
-                    placeholder="ユーザーIDを入力"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="メールアドレスを入力"
                     className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-slate-900 font-bold text-base placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
                     required
                     disabled={isLoading}
@@ -171,10 +149,10 @@ export const Login: React.FC = () => {
               <div className="mt-8 pt-8 border-t border-slate-200">
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">テストアカウント</p>
                 <div className="space-y-2 text-[10px] text-slate-600 font-bold">
-                  <p>管理者: ID 1 / パスワード admin123</p>
-                  <p>制作者: ID 2 / パスワード creator123</p>
-                  <p>自治体: ID 3 / パスワード sapporo123</p>
-                  <p>事業者: ID 101 / パスワード farm123</p>
+                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('admin@example.com', 'password')}>管理者: admin@example.com</p>
+                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('creator@example.com', 'password')}>制作者: creator@example.com</p>
+                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('municipality@example.com', 'password')}>自治体: municipality@example.com</p>
+                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('business@example.com', 'password')}>事業者: business@example.com</p>
                 </div>
               </div>
             </div>

@@ -46,6 +46,23 @@
         background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
         background-size: 20px 20px;
       }
+      .scrollbar-show::-webkit-scrollbar {
+        height: 8px;
+      }
+      .scrollbar-show::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .scrollbar-show::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+      }
+      .scrollbar-show::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      .scrollbar-show {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+      }
     </style>
   <script type="importmap">
 {

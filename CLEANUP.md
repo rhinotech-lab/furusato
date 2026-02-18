@@ -21,7 +21,15 @@
 - `complete-setup-manual.sh` → ドキュメントに統合
 - `final-status-summary.sh` → `check-setup-status.sh` に統合
 
-### 3. .gitignore の更新
+### 3. 未使用ページの削除
+
+以下のページコンポーネントはルーティングされていないため削除済み：
+
+- `pages/TrendAnalysis.tsx` - トレンド分析（削除済み）
+- `pages/TrendCatalog.tsx` - トレンドカタログ（削除済み）
+- `pages/DesignCatalog.tsx` - デザインカタログ（削除済み）
+
+### 4. .gitignore の更新
 
 WindowsのZone.Identifierファイルを無視するように設定
 

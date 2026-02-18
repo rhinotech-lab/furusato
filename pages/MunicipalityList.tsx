@@ -8,7 +8,6 @@ import {
   Building2, 
   Edit, 
   ArrowRight, 
-  Brain, 
   Map as MapIcon, 
   ChevronRight, 
   X,
@@ -47,13 +46,10 @@ export const MunicipalityList: React.FC = () => {
   const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : '/admin';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 px-8 lg:px-12 pt-8 pb-12 h-full flex flex-col">
+    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div className="flex flex-col">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-              <span>マスター管理</span>
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter">自治体一覧</h1>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">自治体一覧</h1>
         </div>
         <Link to="/admin/municipalities/new" className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl active:scale-95">
           <Plus size={20} /> 新規登録
@@ -61,31 +57,31 @@ export const MunicipalityList: React.FC = () => {
       </div>
 
       {/* 都道府県フィルターセクション */}
-      <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100 overflow-hidden shrink-0">
-        <div className="px-10 py-6 border-b border-slate-50 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
-                <MapIcon size={18} />
+      <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden shrink-0">
+        <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+             <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                <MapIcon size={14} />
              </div>
-             <h3 className="text-[12px] font-black text-slate-900 uppercase tracking-widest">都道府県で絞り込む</h3>
+             <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">都道府県で絞り込む</h3>
           </div>
           {selectedPref && (
             <button 
               onClick={() => setSelectedPref(null)}
-              className="flex items-center gap-2 px-4 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black hover:bg-rose-100 transition-colors"
             >
-              <X size={14} /> 選択解除: {selectedPref}
+              <X size={12} /> 選択解除: {selectedPref}
             </button>
           )}
         </div>
-        <div className="p-8 space-y-8 overflow-x-auto scrollbar-hide">
+        <div className="p-4 space-y-4 overflow-x-auto scrollbar-hide">
           {PREFECTURES.map((group) => (
-            <div key={group.region} className="flex items-start gap-8 min-w-[800px]">
-              <div className="w-40 shrink-0 flex items-center gap-3 pt-1 text-slate-400">
-                <group.icon size={14} />
-                <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{group.region}</span>
+            <div key={group.region} className="flex items-start gap-4 min-w-[700px]">
+              <div className="w-28 shrink-0 flex items-center gap-2 pt-1 text-slate-400">
+                <group.icon size={12} />
+                <span className="text-[9px] font-black uppercase tracking-widest whitespace-nowrap">{group.region}</span>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {group.names.map(name => {
                   const hasData = MUNICIPALITIES.some(m => m.name.startsWith(name));
                   const isActive = selectedPref === name;
@@ -93,7 +89,7 @@ export const MunicipalityList: React.FC = () => {
                     <button
                       key={name}
                       onClick={() => setSelectedPref(isActive ? null : name)}
-                      className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all border whitespace-nowrap ${
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap ${
                         isActive 
                           ? 'bg-slate-900 text-white border-slate-900 shadow-lg scale-105 z-10' 
                           : hasData 
@@ -113,13 +109,13 @@ export const MunicipalityList: React.FC = () => {
       </div>
 
       {/* 検索バー */}
-      <div className="bg-white p-5 rounded-[2rem] shadow-premium border border-slate-100 shrink-0">
+      <div className="bg-white p-4 rounded-[1.5rem] shadow-premium border border-slate-100 shrink-0">
         <div className="relative">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
           <input 
             type="text" 
             placeholder="自治体名、または自治体コードでキーワード検索..." 
-            className="w-full pl-14 pr-5 py-4 bg-slate-50 border-0 rounded-2xl outline-none focus:bg-white focus:ring-4 focus:ring-accent/5 transition-all text-sm font-bold text-slate-700" 
+            className="w-full pl-14 pr-5 py-3 bg-slate-50 border-0 rounded-2xl outline-none focus:bg-white transition-all text-sm font-bold text-slate-700" 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
           />
@@ -127,61 +123,56 @@ export const MunicipalityList: React.FC = () => {
       </div>
 
       {/* 自治体リストテーブル */}
-      <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
+      <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
         <div className="overflow-auto scrollbar-hide flex-1">
-          <table className="w-full text-left border-separate border-spacing-0">
+          <table className="w-full text-left min-w-[700px] border-separate border-spacing-0">
             <thead className="sticky top-0 z-20">
-              <tr className="bg-slate-50/80 backdrop-blur-md text-slate-400 shadow-sm">
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-48">コード</th>
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">自治体名</th>
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-64">操作</th>
+              <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-36">コード</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">自治体名</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-48">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredMunicipalities.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-10 py-32 text-center text-slate-300 font-black text-lg">
+                  <td colSpan={3} className="px-8 py-10 text-center text-slate-300 font-bold">
                     該当する自治体が見つかりませんでした
                   </td>
                 </tr>
               ) : filteredMunicipalities.map(m => (
                 <tr key={m.id} className="hover:bg-slate-50 transition-colors group">
-                  <td className="px-10 py-8">
-                    <div className="flex items-center gap-2 font-mono text-slate-400 text-[13px] font-bold tracking-wider">
-                        <MapPin size={14} className="text-slate-200" />
+                  <td className="px-6 py-4 border-b border-slate-50/50">
+                    <div className="flex items-center gap-1.5 font-mono text-slate-400 text-[11px] font-bold tracking-wider">
+                        <MapPin size={12} className="text-slate-200" />
                         {m.code}
                     </div>
                   </td>
-                  <td className="px-10 py-8">
-                    <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 text-lg tracking-tight group-hover:text-accent transition-colors">
+                  <td className="px-6 py-4 border-b border-slate-50/50">
+                    <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-slate-900 text-[14px] truncate">
                             {m.name}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1 opacity-60">Registered Municipality</span>
+                        <span className="text-[10px] text-slate-400 font-bold mt-0.5">登録済み自治体</span>
                     </div>
                   </td>
-                  <td className="px-10 py-8 text-center">
-                    <div className="flex items-center justify-center gap-3">
-                      <Link 
-                        to={`${basePath}/analysis?id=${m.id}`} 
-                        className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all group/ai shadow-sm active:scale-95"
-                        title="傾向分析AIを開く"
-                      >
-                        <Brain size={22} className="group-hover/ai:scale-110 transition-transform" />
-                      </Link>
+                  <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                    <div className="flex items-center justify-center gap-2">
                       <Link 
                         to={`/admin/municipalities/${m.id}/edit`} 
-                        className="inline-flex items-center justify-center w-12 h-12 bg-slate-50 text-slate-300 hover:text-slate-600 rounded-2xl hover:bg-slate-100 transition-all active:scale-95 shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap"
                         title="基本情報編集"
                       >
-                        <Edit size={22} />
+                        <Edit size={12} />
+                        編集
                       </Link>
                       <Link 
                         to={`/admin/businesses/municipality/${m.id}`} 
-                        className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 text-accent rounded-2xl hover:bg-accent hover:text-white transition-all group/btn shadow-sm active:scale-95"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 text-[11px] font-bold text-accent bg-blue-50 hover:bg-blue-100 rounded-xl transition-all active:scale-95 whitespace-nowrap"
                         title="事業者一覧を表示"
                       >
-                        <ArrowRight size={22} strokeWidth={3} className="group-hover/btn:translate-x-0.5 transition-transform" />
+                        <ArrowRight size={12} />
+                        事業者
                       </Link>
                     </div>
                   </td>

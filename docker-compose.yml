@@ -1,3 +1,5 @@
+name: furusato
+
 services:
   # MySQL データベース
   mysql:
@@ -61,23 +63,21 @@ services:
     networks:
       - furusato_network
 
-  # React フロントエンド
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    container_name: furusato_frontend
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    environment:
-      - VITE_API_URL=http://localhost:8080/api
-    networks:
-      - furusato_network
-    depends_on:
-      - nginx
+  # React フロントエンドは npm run dev で起動 (port 3000)
+  # Docker での本番ビルドが必要な場合は以下のコメントを解除
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #   container_name: furusato_frontend
+  #   ports:
+  #     - "3000:8080"
+  #   environment:
+  #     - VITE_API_URL=http://localhost:8080/api
+  #   networks:
+  #     - furusato_network
+  #   depends_on:
+  #     - nginx
 
 volumes:
   mysql_data:

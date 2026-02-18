@@ -35,26 +35,28 @@ export const MunicipalityForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-900">
-          <ArrowLeft size={20} />
+        <button onClick={() => navigate(-1)} className="p-2 bg-white text-slate-400 hover:text-slate-900 rounded-xl shadow-sm border border-slate-100 transition-all active:scale-90">
+          <ArrowLeft size={16} />
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {isEdit ? '自治体情報の編集' : '自治体の新規登録'}
-        </h1>
+        <div>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">
+            {isEdit ? '自治体情報の編集' : '自治体の新規登録'}
+          </h1>
+        </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white p-6 rounded-2xl shadow-premium border border-slate-100">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-1">
               自治体コード <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all"
               placeholder="例: 011002"
               value={formData.code}
               onChange={e => setFormData({...formData, code: e.target.value})}
@@ -62,32 +64,32 @@ export const MunicipalityForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 px-1">
               自治体名 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all"
               placeholder="例: 北海道札幌市"
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
             />
           </div>
 
-          <div className="pt-4 flex justify-end gap-3">
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-50">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-6 py-2.5 text-slate-400 bg-slate-50 hover:bg-slate-100 rounded-xl font-bold text-sm transition-all"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 font-bold text-sm"
             >
-              <Save size={18} />
+              <Save size={14} />
               保存する
             </button>
           </div>

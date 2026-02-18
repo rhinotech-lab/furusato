@@ -58,13 +58,10 @@ export const BusinessList: React.FC = () => {
   const isMunicipalityUser = currentUser?.role === 'municipality_user';
 
   return (
-    <div className="max-w-5xl mx-auto w-full space-y-4 animate-in fade-in duration-700 h-full flex flex-col px-4">
+    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div className="flex flex-col">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-              <span>事業者一覧</span>
-          </div>
-          <h1 className="text-xl font-black text-slate-900 tracking-tighter">事業者管理</h1>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">事業者一覧</h1>
         </div>
         <Link to={`${basePath}/businesses/new`} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg font-bold text-[11px] hover:bg-slate-800 transition-all shadow-md active:scale-95">
           <Plus size={14} /> 新規登録
@@ -112,25 +109,21 @@ export const BusinessList: React.FC = () => {
                 <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-32">2. ポータル</th>
                 <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-24">3. 品数</th>
                 <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-40 text-center">4. アクティビティ</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-24">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredBusinesses.length === 0 ? (
-                  <tr><td colSpan={4} className="px-8 py-10 text-center text-slate-300 font-bold">事業者が見つかりませんでした</td></tr>
+                  <tr><td colSpan={5} className="px-8 py-10 text-center text-slate-300 font-bold">事業者が見つかりませんでした</td></tr>
               ) : filteredBusinesses.map(b => {
                 const stats = getBusinessStats(b.id);
                 return (
                   <tr key={b.id} className="hover:bg-slate-50 transition-colors group">
-                    {/* 1. 事業者情報 (名前 + カテゴリ + 編集) */}
+                    {/* 1. 事業者情報 (名前 + カテゴリ) */}
                     <td className="px-6 py-4 border-b border-slate-50/50">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-slate-900 text-[14px] truncate">{b.name}</span>
-                          <span className="text-[10px] text-slate-400 font-bold mt-0.5">{b.category || '未設定'}</span>
-                        </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                            <Link to={`${basePath}/businesses/${b.id}/edit`} className="p-1 text-slate-200 hover:text-slate-600 transition-colors" title="編集"><Edit size={14} /></Link>
-                        </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-slate-900 text-[14px] truncate">{b.name}</span>
+                        <span className="text-[10px] text-slate-400 font-bold mt-0.5">{b.category || '未設定'}</span>
                       </div>
                     </td>
 
@@ -178,6 +171,17 @@ export const BusinessList: React.FC = () => {
                           商品詳細 <ChevronRight size={10} />
                         </Link>
                       </div>
+                    </td>
+
+                    {/* 5. 操作 */}
+                    <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                      <Link
+                        to={`${basePath}/businesses/${b.id}/edit`}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap"
+                      >
+                        <Edit size={12} />
+                        編集
+                      </Link>
                     </td>
                   </tr>
                 );

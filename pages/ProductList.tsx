@@ -77,13 +77,10 @@ export const ProductList: React.FC = () => {
   const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : '/admin';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 h-full flex flex-col px-8 lg:px-12 pt-8">
+    <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div className="flex flex-col">
-          <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
-              <span>商品一覧</span>
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter">返礼品管理</h1>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">商品一覧</h1>
         </div>
         <div className="flex items-center gap-3">
           <Link to={`${basePath}/products/new`} className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl active:scale-95">
@@ -161,56 +158,58 @@ export const ProductList: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
+      <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden flex flex-col flex-1 min-h-0">
         <div className="overflow-auto scrollbar-hide flex-1">
-          <table className="w-full text-left border-separate border-spacing-0">
+          <table className="w-full text-left min-w-[700px] border-separate border-spacing-0">
             <thead className="sticky top-0 z-20">
-              <tr className="bg-slate-50/80 backdrop-blur-md text-slate-400 shadow-sm">
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-48">商品コード</th>
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">商品名 / 事業者</th>
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-48">最終画像更新</th>
-                <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest w-20 border-b border-slate-100"></th>
+              <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-36">商品コード</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">商品名 / 事業者</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-36">最終画像更新</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest w-24 border-b border-slate-100 text-center">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {products.length === 0 ? (
-                  <tr><td colSpan={4} className="px-10 py-32 text-center text-slate-300 font-black text-lg">対象の商品が見つかりませんでした</td></tr>
+                  <tr><td colSpan={4} className="px-8 py-10 text-center text-slate-300 font-bold">対象の商品が見つかりませんでした</td></tr>
               ) : products.map(p => {
                 const business = BUSINESSES.find(b => b.id === p.business_id);
                 return (
-                  <tr key={p.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-10 py-8 font-mono text-slate-400 text-[13px] font-bold tracking-wider">#{p.product_code || '---'}</td>
-                    <td className="px-10 py-8">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 text-lg tracking-tight group-hover:text-accent transition-colors">{p.name}</span>
-                        <div className="flex items-center gap-3 mt-2">
-                            <span className="text-[11px] text-slate-400 font-black uppercase tracking-[0.1em]">{business?.name}</span>
-                            <span className="text-[10px] text-slate-300 font-mono font-bold">({business?.code})</span>
+                  <tr key={p.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="px-6 py-4 border-b border-slate-50/50">
+                      <span className="font-mono text-slate-400 text-[11px] font-bold tracking-wider">#{p.product_code || '---'}</span>
+                    </td>
+                    <td className="px-6 py-4 border-b border-slate-50/50">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-slate-900 text-[14px] truncate">{p.name}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-slate-400 font-bold">{business?.name}</span>
+                            <span className="text-[9px] text-slate-300 font-mono font-bold">({business?.code})</span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-8 text-center">
-                        <div className="flex flex-col items-center gap-1.5">
+                    <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                        <div className="flex flex-col items-center gap-0.5">
                             {p.lastUpdate ? (
                                 <>
-                                    <span className="text-[13px] font-mono font-black text-slate-600 tracking-tighter">
+                                    <span className="text-[11px] font-mono font-bold text-slate-600">
                                         {p.lastUpdate.replace(/-/g, '/')}
                                     </span>
-                                    <span className="text-[9px] text-emerald-500 font-black uppercase tracking-[0.2em] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Updated</span>
+                                    <span className="text-[8px] text-emerald-500 font-black uppercase tracking-widest">更新済み</span>
                                 </>
                             ) : (
-                                <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest">未アップロード</span>
+                                <span className="text-[10px] font-bold text-slate-200">未アップロード</span>
                             )}
                         </div>
                     </td>
-                    <td className="px-10 py-8 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <Link to={`${basePath}/products/${p.id}/edit`} className="p-3 bg-slate-50 rounded-xl text-slate-300 hover:text-slate-600 hover:bg-slate-100 transition-all"><Edit size={20} /></Link>
+                    <td className="px-4 py-4 text-center border-b border-slate-50/50">
+                      <div className="flex items-center justify-center gap-2">
                         <Link 
-                          to={`${basePath}/images?productId=${p.id}`} 
-                          className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 text-accent rounded-2xl hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn"
+                          to={`${basePath}/products/${p.id}/edit`} 
+                          className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap"
                         >
-                          <ArrowRight size={24} strokeWidth={3} className="group-hover/btn:translate-x-0.5 transition-transform" />
+                          <Edit size={12} />
+                          編集
                         </Link>
                       </div>
                     </td>

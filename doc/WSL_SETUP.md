@@ -21,6 +21,7 @@
 - **Windows 10/11**（WSL2対応）
 - **WSL2** がインストール済み
 - **Ubuntu**（またはDebianベースのLinuxディストリビューション）がWSL2で動作していること
+- **Node.js 20以上**（フロントエンド開発用）
 
 ### WSL2の確認
 
@@ -267,9 +268,9 @@ LOG_LEVEL=debug
 SANCTUM_STATEFUL_DOMAINS=localhost:3000
 SESSION_DOMAIN=localhost
 EOF
-    echo "✅ .envファイルを作成しました"
+    echo ".envファイルを作成しました"
 else
-    echo "ℹ️  .envファイルは既に存在します"
+    echo ".envファイルは既に存在します"
 fi
 
 cd ..
@@ -304,20 +305,30 @@ docker compose up --build -d
 docker compose ps
 ```
 
-以下の4つのコンテナがすべて `Up` 状態であることを確認:
+以下の3つのコンテナがすべて `Up` 状態であることを確認:
 
 | コンテナ名 | サービス | ポート |
 |---|---|---|
 | furusato_mysql | MySQL 8.0 | 3306 |
 | furusato_backend | Laravel (PHP-FPM) | 8000:9000 |
 | furusato_nginx | Nginx | 8080:80 |
-| furusato_frontend | React | 3000:80 |
+
+> **注意**: フロントエンドは `npm run dev` で別途起動します（Docker Composeには含まれていません）。
 
 ### 4. Laravelの初期設定
 
 ```bash
+# Composerの依存関係をインストール
+docker compose exec backend composer install
+
 # アプリケーションキーを生成
 docker compose exec backend php artisan key:generate
+
+# ストレージの権限を設定
+docker compose exec backend bash -c "chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache"
+
+# Sanctumのマイグレーションを公開
+docker compose exec backend php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 
 # データベースマイグレーション
 docker compose exec backend php artisan migrate
@@ -326,11 +337,16 @@ docker compose exec backend php artisan migrate
 docker compose exec backend php artisan db:seed
 ```
 
-### 5. ストレージのパーミッション設定
+### 5. フロントエンドの起動
 
 ```bash
-docker compose exec backend bash -c "chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache"
+# プロジェクトルートで実行
+npm install
+npm run dev
 ```
+
+フロントエンドは http://localhost:3000 で起動します。  
+Viteのプロキシ設定により、`/api` へのリクエストは自動的に `http://localhost:8080` に転送されます。
 
 ### 6. アクセス確認
 
@@ -347,6 +363,7 @@ docker compose exec backend bash -c "chmod -R 775 storage bootstrap/cache && cho
 | ロール | メールアドレス | パスワード |
 |---|---|---|
 | 管理者 | `admin@example.com` | `password` |
+| 制作者 | `creator@example.com` | `password` |
 | 自治体ユーザー | `municipality@example.com` | `password` |
 | 事業者ユーザー | `business@example.com` | `password` |
 
@@ -389,6 +406,8 @@ docker compose exec backend php artisan db:seed
 # データベースの完全リセット
 docker compose down -v
 docker compose up --build -d
+docker compose exec backend composer install
+docker compose exec backend php artisan key:generate
 docker compose exec backend php artisan migrate
 docker compose exec backend php artisan db:seed
 ```
@@ -494,7 +513,28 @@ docker compose exec backend php artisan migrate
 docker compose exec backend bash -c "chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache"
 ```
 
-### 7. コンテナが起動しない（Exited状態）
+### 7. Sanctumのテーブルが見つからない
+
+**症状**: `SQLSTATE[42S02]: Base table or view not found: 1146 Table 'furusato_db.personal_access_tokens' doesn't exist`
+
+**解決方法**:
+```bash
+docker compose exec backend php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+docker compose exec backend php artisan migrate
+```
+
+### 8. vendorディレクトリが空
+
+**症状**: Laravel のクラスが見つからないエラー
+
+**原因**: Docker Composeのボリュームマウントにより `vendor` が空になる場合がある
+
+**解決方法**:
+```bash
+docker compose exec backend composer install
+```
+
+### 9. コンテナが起動しない（Exited状態）
 
 **解決方法**:
 ```bash
@@ -506,7 +546,7 @@ docker compose down -v
 docker compose up --build -d
 ```
 
-### 8. WSL2のメモリ不足
+### 10. WSL2のメモリ不足
 
 **症状**: システムが重い、コンテナが頻繁にクラッシュ
 
@@ -528,20 +568,6 @@ WSLを再起動:
 ```powershell
 wsl --shutdown
 wsl -d Ubuntu
-```
-
-### 9. ネットワーク接続の問題
-
-**症状**: コンテナ間で通信できない
-
-**解決方法**:
-```bash
-# ネットワークを確認
-docker network ls
-
-# コンテナを再作成
-docker compose down
-docker compose up --build -d
 ```
 
 ---
