@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { mockDb, MUNICIPALITIES, BUSINESSES, PRODUCTS } from '../services/mockDb';
 import { StatusBadge } from '../components/StatusBadge';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { canApproveImage } from '../utils/permissions';
+import { canApproveImage, canUploadImage } from '../utils/permissions';
 import { 
   Search, Plus, Calendar, CheckCircle2, CheckSquare, 
   Square, X, MousePointerClick, ImageIcon, 
-  ArrowRight, ExternalLink, Download, FileUp, Loader2, AlertCircle, FileText, Upload, Globe, Hash, ShoppingBag 
+  ArrowRight, ExternalLink, Download, FileUp, Loader2, AlertCircle, FileText, Upload, Globe, Hash, ShoppingBag, Edit
 } from 'lucide-react';
 import { ImageStatus } from '../types';
 
@@ -65,15 +65,61 @@ export const ImageList: React.FC = () => {
   }, [productId, currentUser]);
 
   const allImages = mockDb.getImages();
-  const enrichedImages = useMemo(() => allImages.map(img => {
-    const latestVersion = img.versions[img.versions.length - 1];
-    const product = mockDb.getProductById(img.product_id);
-    const business = product ? mockDb.getBusinessById(product.business_id) : null;
-    const municipality = business ? MUNICIPALITIES.find(m => m.id === business.municipality_id) : null;
-    const submittedDate = new Date(latestVersion.created_at);
-    const monthKey = `${submittedDate.getFullYear()}-${String(submittedDate.getMonth() + 1).padStart(2, '0')}`;
-    return { ...img, business, product, latestVersion, monthKey, municipalityName: municipality?.name || '' };
-  }), [allImages]);
+  const allProjects = mockDb.getProjects();
+  const enrichedImages = useMemo(() => {
+    const mappedImages = allImages.map(img => {
+      const latestVersion = img.versions[img.versions.length - 1];
+      const product = mockDb.getProductById(img.product_id);
+      const project = product?.project_id ? mockDb.getProjectById(product.project_id) : null;
+      const business = product ? mockDb.getBusinessById(product.business_id) : null;
+      const municipality = business ? MUNICIPALITIES.find(m => m.id === business.municipality_id) : null;
+      const submittedDate = new Date(latestVersion.created_at);
+      const monthKey = `${submittedDate.getFullYear()}-${String(submittedDate.getMonth() + 1).padStart(2, '0')}`;
+      return { ...img, business, product, project, latestVersion, monthKey, municipalityName: municipality?.name || '', isProjectOnly: false };
+    });
+
+    const representedProjectIds = new Set(
+      mappedImages.map(row => row.project?.id).filter((pid): pid is number => typeof pid === 'number')
+    );
+
+    const projectOnlyRows = allProjects
+      .filter(project => !representedProjectIds.has(project.id))
+      .map(project => {
+        const projectProducts = PRODUCTS.filter(p => p.project_id === project.id);
+        const product = projectProducts[0] || null;
+        const business = product ? mockDb.getBusinessById(product.business_id) : null;
+        const latestVersion = {
+          id: -project.id,
+          image_id: -project.id,
+          version_number: 1,
+          file_path: '',
+          status: 'draft' as ImageStatus,
+          submitted_at: `${project.created_at}T00:00:00`,
+          created_at: `${project.created_at}T00:00:00`,
+        };
+        const submittedDate = new Date(latestVersion.created_at);
+        const monthKey = `${submittedDate.getFullYear()}-${String(submittedDate.getMonth() + 1).padStart(2, '0')}`;
+
+        return {
+          id: -project.id,
+          product_id: product?.id || 0,
+          title: project.name,
+          external_url: undefined,
+          created_by_admin_id: 0,
+          created_at: latestVersion.created_at,
+          versions: [latestVersion],
+          latestVersion,
+          business,
+          product,
+          project,
+          monthKey,
+          municipalityName: MUNICIPALITIES.find(m => m.id === project.municipality_id)?.name || '',
+          isProjectOnly: true,
+        };
+      });
+
+    return [...mappedImages, ...projectOnlyRows];
+  }, [allImages, allProjects]);
 
   const monthOptions = useMemo(() => {
     const months = new Set<string>();
@@ -108,7 +154,7 @@ export const ImageList: React.FC = () => {
   }), [enrichedImages, currentUser, productId, filterMunicipality, filterBusiness, filterStatus, selectedMonth, searchTerm]);
 
   const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : currentUser?.role === 'business_user' ? '/business' : '/admin';
-  const isBusinessUser = currentUser?.role === 'business_user';
+  const canUpload = canUploadImage(currentUser);
   const isAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'creator';
 
   const pendingImages = filteredImages.filter(img => img.latestVersion.status === 'pending_review');
@@ -262,7 +308,7 @@ export const ImageList: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          {!isBusinessUser && (
+          {canUpload && (
             <>
               <button 
                 onClick={() => setIsUploadModalOpen(true)}
@@ -333,13 +379,13 @@ export const ImageList: React.FC = () => {
               <colgroup>
                 <col style={{ width: '3%' }} />
                 <col style={{ width: '5%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '11%' }} />
+                <col style={{ width: '25%' }} />
+                <col style={{ width: '12%' }} />
                 <col style={{ width: '5%' }} />
-                <col style={{ width: '13%' }} />
-                <col style={{ width: '9%' }} />
-                <col style={{ width: '31%' }} />
-                <col style={{ width: '3%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '10%' }} />
               </colgroup>
               <thead className="sticky top-0 z-20">
                 <tr className="bg-white/95 backdrop-blur-sm text-slate-400 text-[10px] font-black uppercase tracking-widest shadow-sm">
@@ -359,7 +405,8 @@ export const ImageList: React.FC = () => {
                    const isSelected = selectedIds.has(img.id);
                    const municipality = MUNICIPALITIES.find(m => m.id === img.business?.municipality_id);
                    const updateDate = new Date(img.latestVersion.created_at);
-                   const deadlineDiff = img.product?.deadline ? Math.ceil((new Date(img.product.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
+                   const rowDeadline = img.product?.deadline || img.project?.deadline;
+                   const deadlineDiff = rowDeadline ? Math.ceil((new Date(rowDeadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
                    return (
                     <tr key={img.id} className={`group transition-all ${isSelected ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}>
                       {/* チェックボックス */}
@@ -370,8 +417,12 @@ export const ImageList: React.FC = () => {
                       </td>
                       {/* プレビュー */}
                       <td className="px-1 py-3 border-b border-slate-50/50">
-                        <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 mx-auto shadow-sm group-hover:scale-110 transition-transform">
-                           <img src={img.latestVersion.file_path} alt="" className="w-full h-full object-cover" />
+                        <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 mx-auto shadow-sm group-hover:scale-110 transition-transform flex items-center justify-center">
+                           {img.latestVersion.file_path ? (
+                             <img src={img.latestVersion.file_path} alt="" className="w-full h-full object-cover" />
+                           ) : (
+                             <ImageIcon size={14} className="text-slate-300" />
+                           )}
                         </div>
                       </td>
                       {/* プロジェクトタイトル / 商品情報 */}
@@ -383,7 +434,7 @@ export const ImageList: React.FC = () => {
                                 <Link 
                                   to={`${basePath}/products/${img.product.id}/edit`} 
                                   className="text-[10px] text-slate-400 font-bold truncate hover:text-accent flex items-center gap-0.5 transition-colors min-w-0"
-                                  title="商品詳細ページへ"
+                                  title="商品編集ページへ"
                                 >
                                   <ShoppingBag size={9} className="shrink-0" />
                                   <span className="truncate">{img.product.name}</span>
@@ -407,7 +458,9 @@ export const ImageList: React.FC = () => {
                       {/* 商品数 */}
                       <td className="px-2 py-3 text-center border-b border-slate-50/50">
                         <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-md text-[10px] font-black border border-blue-100">
-                          {img.business ? PRODUCTS.filter(p => p.business_id === img.business!.id).length : 0}
+                          {img.project
+                            ? PRODUCTS.filter(p => p.project_id === img.project.id).length
+                            : (img.business ? PRODUCTS.filter(p => p.business_id === img.business!.id).length : 0)}
                         </span>
                       </td>
                       {/* 作成日 / 期限 */}
@@ -416,9 +469,9 @@ export const ImageList: React.FC = () => {
                           <span className="text-[10px] font-mono font-bold text-slate-500 whitespace-nowrap">
                             {new Date(img.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                           </span>
-                          {img.product?.deadline ? (
+                          {rowDeadline ? (
                             <span className={`text-[9px] font-mono font-black whitespace-nowrap ${deadlineDiff !== null && deadlineDiff < 0 ? 'text-red-500' : (deadlineDiff !== null && deadlineDiff <= 7 ? 'text-amber-500' : 'text-slate-400')}`}>
-                              期限 {new Date(img.product.deadline).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' })}
+                              期限 {new Date(rowDeadline).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' })}
                               {deadlineDiff !== null && deadlineDiff < 0 && <span className="ml-0.5">({Math.abs(deadlineDiff)}日超過)</span>}
                               {deadlineDiff !== null && deadlineDiff >= 0 && deadlineDiff <= 7 && <span className="ml-0.5">(残{deadlineDiff}日)</span>}
                             </span>
@@ -441,7 +494,7 @@ export const ImageList: React.FC = () => {
                         <div className="flex items-center gap-1.5 justify-center flex-nowrap">
                           <StatusBadge status={img.latestVersion.status} />
                           {img.external_url ? (
-                            <a href={img.external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-blue-50 hover:text-accent rounded-md transition-all border border-slate-100 whitespace-nowrap">
+                            <a href={img.external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-blue-50 hover:text-accent rounded-md transition-all border border-slate-100 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                               <ExternalLink size={10} />
                               URL
                             </a>
@@ -451,7 +504,7 @@ export const ImageList: React.FC = () => {
                               URL
                             </span>
                           )}
-                          <button onClick={(e) => downloadImage(img.latestVersion.file_path, img.title, e)} className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-blue-50 hover:text-accent rounded-md transition-all border border-slate-100 whitespace-nowrap">
+                          <button onClick={(e) => { e.stopPropagation(); if (img.latestVersion.file_path) downloadImage(img.latestVersion.file_path, img.title, e); }} disabled={!img.latestVersion.file_path} className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-blue-50 hover:text-accent rounded-md transition-all border border-slate-100 whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed">
                             <Download size={10} />
                             保存
                           </button>
@@ -459,12 +512,24 @@ export const ImageList: React.FC = () => {
                       </td>
                       {/* 詳細 */}
                       <td className="px-1 py-3 text-center border-b border-slate-50/50">
-                        <Link 
-                          to={`${basePath}/revisions/${img.id}`}
-                          className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-lg hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn"
-                        >
-                          <ArrowRight size={12} className="group-hover/btn:translate-x-0.5 transition-transform" />
-                        </Link>
+                        <div className="flex items-center gap-1.5 justify-center">
+                          <Link 
+                            to={`${basePath}/revisions/${img.id}/edit`}
+                            className="inline-flex items-center gap-0.5 px-1.5 py-1 text-[10px] font-bold text-slate-500 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-600 rounded-md transition-all border border-slate-100 whitespace-nowrap"
+                            title="この一覧情報を編集"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Edit size={10} />
+                            編集
+                          </Link>
+                          <Link 
+                            to={`${basePath}/revisions/${img.id}`}
+                            className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-lg hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ArrowRight size={12} className="group-hover/btn:translate-x-0.5 transition-transform" />
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                    );

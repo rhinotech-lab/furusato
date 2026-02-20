@@ -446,6 +446,14 @@ export const mockDb = {
     }
   },
 
+  deleteProduct: (id: number) => {
+    const index = PRODUCTS.findIndex(p => p.id === id);
+    if (index !== -1) {
+      PRODUCTS.splice(index, 1);
+      saveToStorage('products', PRODUCTS);
+    }
+  },
+
   addProject: (data: any) => {
     const maxId = PROJECTS.reduce((max, p) => Math.max(max, p.id), 0);
     const newProj = { ...data, id: maxId + 1, created_at: new Date().toISOString().split('T')[0] };
@@ -458,6 +466,14 @@ export const mockDb = {
     const index = PROJECTS.findIndex(p => p.id === id);
     if (index !== -1) {
       PROJECTS[index] = { ...PROJECTS[index], ...data };
+      saveToStorage('projects', PROJECTS);
+    }
+  },
+
+  deleteProject: (id: number) => {
+    const index = PROJECTS.findIndex(p => p.id === id);
+    if (index !== -1) {
+      PROJECTS.splice(index, 1);
       saveToStorage('projects', PROJECTS);
     }
   },
@@ -494,6 +510,21 @@ export const mockDb = {
       saveToStorage('images', images);
     }
   },
+
+  updateImage: (id: number, data: any) => {
+    const img = images.find(i => i.id === id);
+    if (img) {
+      Object.assign(img, data);
+      saveToStorage('images', images);
+    }
+  },
+
+  deleteImage: (id: number) => {
+    images = images.filter(i => i.id !== id);
+    comments = comments.filter(c => c.image_id !== id);
+    saveToStorage('images', images);
+    saveToStorage('comments', comments);
+  },
   
   updateVersionStatus: (imageId: number, versionId: number, status: ImageStatus) => {
     const img = images.find(i => i.id === imageId);
@@ -504,6 +535,27 @@ export const mockDb = {
         saveToStorage('images', images);
       }
     }
+  },
+
+  addImageVersion: (imageId: number, filePath: string) => {
+    const img = images.find(i => i.id === imageId);
+    if (img) {
+      const now = new Date().toISOString();
+      const maxVersionNumber = Math.max(...img.versions.map(v => v.version_number), 0);
+      const newVersion = {
+        id: Date.now(),
+        image_id: imageId,
+        version_number: maxVersionNumber + 1,
+        file_path: filePath,
+        status: 'pending_review' as ImageStatus,
+        submitted_at: now,
+        created_at: now
+      };
+      img.versions.push(newVersion);
+      saveToStorage('images', images);
+      return newVersion;
+    }
+    return null;
   },
 
   getCommentsByImageId: (imageId: number) => comments.filter(c => c.image_id === imageId),

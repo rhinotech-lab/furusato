@@ -3,19 +3,29 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { mockDb, MUNICIPALITIES, BUSINESSES, PRODUCTS } from '../services/mockDb';
-import { ArrowLeft, UploadCloud, FileImage, X, Brain, Sparkles, AlertTriangle, ThumbsUp, Link as LinkIcon } from 'lucide-react';
-import { canUploadImage } from '../utils/permissions';
+import { ArrowLeft, UploadCloud, FileImage, X, Link as LinkIcon } from 'lucide-react';
 
 export const ImageUpload: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   
-  const [step, setStep] = useState(1); // 1: Select Product, 2: Upload File
+  const [step, setStep] = useState(1); // 1: Select/Create Product, 2: Upload Image
+  
+  // Project State
+  const [projectName, setProjectName] = useState('');
+  const [projectDeadline, setProjectDeadline] = useState('');
   
   // Selection State
   const [selectedMunicipalityId, setSelectedMunicipalityId] = useState<string>('');
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
   const [selectedProductId, setSelectedProductId] = useState<string>('');
+  const [isNewProduct, setIsNewProduct] = useState(false);
+
+  // New Product State
+  const [newProductName, setNewProductName] = useState('');
+  const [newProductCode, setNewProductCode] = useState('');
+  const [newProductDeadline, setNewProductDeadline] = useState('');
+
   const [title, setTitle] = useState('');
   const [externalUrl, setExternalUrl] = useState('');
 
@@ -38,15 +48,6 @@ export const ImageUpload: React.FC = () => {
   const filteredProducts = PRODUCTS.filter(p => 
     !selectedBusinessId || p.business_id.toString() === selectedBusinessId
   );
-
-  // AIインサイトの取得 (モック)
-  const municipalityInsight = selectedMunicipalityId === '1' ? {
-    tip: "寒色系（青・紫）を避けると承認率がアップします。",
-    risk: "金額フォントサイズ不足による差し戻しに注意。"
-  } : selectedMunicipalityId === '3' ? {
-    tip: "モダンでフラットなデザインを好まれます。",
-    risk: "市章の配置ミスは致命的な差し戻しになります。"
-  } : null;
 
   // Handlers
   const handleDragOver = (e: React.DragEvent) => {
@@ -78,14 +79,64 @@ export const ImageUpload: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProductId || !title || !previewUrl) return;
+    if (!projectName || !selectedMunicipalityId) return;
+    
+    let targetProductId = Number(selectedProductId);
 
-    mockDb.addImage({
-        product_id: Number(selectedProductId),
-        title: title,
-        external_url: externalUrl,
-        created_by_admin_id: currentUser!.id,
-        file_path: previewUrl
+    // プロジェクトを作成
+    const newProject = mockDb.addProject({
+        name: projectName,
+        municipality_id: Number(selectedMunicipalityId),
+        status: 'in_progress',
+        deadline: projectDeadline || undefined
+    });
+    const createdProjectId = newProject.id;
+
+    // 新規商品作成の場合
+    if (isNewProduct) {
+        if (!newProductName || !selectedBusinessId) return;
+        
+        const newProduct = mockDb.addProduct({
+            name: newProductName,
+            business_id: Number(selectedBusinessId),
+            project_id: createdProjectId,
+            product_code: newProductCode || undefined,
+            deadline: newProductDeadline || undefined,
+            donation_amount: 0, // デフォルト値
+            portals: [] // デフォルト値
+        });
+        targetProductId = newProduct.id;
+    } else {
+        if (!selectedProductId) return;
+        // 既存商品にプロジェクトIDを紐付け
+        mockDb.updateProduct(targetProductId, { project_id: createdProjectId });
+    }
+
+    // 画像がある場合のみ画像エンティティを作成
+    if (previewUrl && title) {
+        mockDb.addImage({
+            product_id: targetProductId,
+            title: title,
+            external_url: externalUrl,
+            created_by_admin_id: currentUser!.id,
+            file_path: previewUrl
+        });
+    }
+
+    const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : '/admin';
+    navigate(`${basePath}/images`);
+  };
+
+  // プロジェクトのみ登録（商品・画像なし）
+  const handleProjectOnlySubmit = () => {
+    if (!projectName || !selectedMunicipalityId) return;
+    
+    // プロジェクトを作成
+    mockDb.addProject({
+        name: projectName,
+        municipality_id: Number(selectedMunicipalityId),
+        status: 'in_progress',
+        deadline: projectDeadline || undefined
     });
 
     const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : '/admin';
@@ -99,16 +150,16 @@ export const ImageUpload: React.FC = () => {
           <ArrowLeft size={16} />
         </button>
         <div>
-          <h1 className="text-xl font-black text-slate-900 tracking-tighter">新規画像登録</h1>
+          <h1 className="text-xl font-black text-slate-900 tracking-tighter">新規プロジェクト登録</h1>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div className="lg:col-span-8">
+      <div className="grid grid-cols-1 gap-4">
+        <div>
           <div className="bg-white rounded-2xl shadow-premium border border-slate-100 overflow-hidden">
             <div className="flex border-b border-slate-50">
                 <div className={`flex-1 p-3 text-center font-bold text-[10px] uppercase tracking-widest ${step === 1 ? 'text-accent bg-blue-50/50' : 'text-slate-300'}`}>
-                    1. 商品選択
+                    1. 商品選択 / 作成
                 </div>
                 <div className={`flex-1 p-3 text-center font-bold text-[10px] uppercase tracking-widest ${step === 2 ? 'text-accent bg-blue-50/50' : 'text-slate-300'}`}>
                     2. 画像アップロード
@@ -118,6 +169,28 @@ export const ImageUpload: React.FC = () => {
             <form onSubmit={handleSubmit} className="p-6">
                 {step === 1 && (
                     <div className="space-y-6 max-w-lg mx-auto">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">プロジェクト名 <span className="text-rose-500">*</span></label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all placeholder:text-slate-300"
+                                placeholder="例: 冬の特産品キャンペーン2025"
+                                value={projectName}
+                                onChange={e => setProjectName(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">プロジェクト期限 <span className="text-[9px] font-medium opacity-50 ml-1">(任意)</span></label>
+                            <input
+                                type="date"
+                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all placeholder:text-slate-300 font-mono"
+                                value={projectDeadline}
+                                onChange={e => setProjectDeadline(e.target.value)}
+                            />
+                        </div>
+
                         {currentUser?.role !== 'municipality_user' && (
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">自治体</label>
@@ -156,29 +229,90 @@ export const ImageUpload: React.FC = () => {
                             </select>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">商品</label>
-                            <select
-                                className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all appearance-none cursor-pointer disabled:opacity-50"
-                                value={selectedProductId}
-                                disabled={!selectedBusinessId}
-                                onChange={e => setSelectedProductId(e.target.value)}
-                            >
-                                <option value="">選択してください</option>
-                                {filteredProducts.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                            </select>
+                        <div className="space-y-3 pt-2">
+                            <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsNewProduct(false)}
+                                    className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${!isNewProduct ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                >
+                                    既存の商品から選択
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsNewProduct(true)}
+                                    className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${isNewProduct ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                >
+                                    新規商品を登録
+                                </button>
+                            </div>
+
+                            {!isNewProduct ? (
+                                <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">商品</label>
+                                    <select
+                                        className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all appearance-none cursor-pointer disabled:opacity-50"
+                                        value={selectedProductId}
+                                        disabled={!selectedBusinessId}
+                                        onChange={e => setSelectedProductId(e.target.value)}
+                                    >
+                                        <option value="">選択してください</option>
+                                        {filteredProducts.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ) : (
+                                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">商品名 <span className="text-rose-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-accent transition-all placeholder:text-slate-300"
+                                            placeholder="例: 特選牛セット"
+                                            value={newProductName}
+                                            onChange={e => setNewProductName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">商品管理番号 <span className="text-[9px] font-medium opacity-50 ml-1">(任意)</span></label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-accent transition-all placeholder:text-slate-300 font-mono"
+                                            placeholder="例: P-12345"
+                                            value={newProductCode}
+                                            onChange={e => setNewProductCode(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">期限 <span className="text-[9px] font-medium opacity-50 ml-1">(任意)</span></label>
+                                        <input
+                                            type="date"
+                                            className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-bold text-slate-700 text-sm focus:border-accent transition-all placeholder:text-slate-300 font-mono"
+                                            value={newProductDeadline}
+                                            onChange={e => setNewProductDeadline(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        <div className="pt-4 flex justify-end">
+                        <div className="pt-4 flex justify-between items-center">
                             <button
                                 type="button"
-                                disabled={!selectedProductId}
-                                onClick={() => setStep(2)}
-                                className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-lg active:scale-95"
+                                disabled={!projectName || !selectedMunicipalityId}
+                                onClick={handleProjectOnlySubmit}
+                                className="px-6 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold text-[11px] hover:bg-slate-200 disabled:bg-slate-50 disabled:text-slate-300 transition-all shadow-sm active:scale-95"
                             >
-                                次へ進む
+                                プロジェクトのみ登録する
+                            </button>
+                            <button
+                                type="button"
+                                disabled={!projectName || !selectedMunicipalityId || !selectedBusinessId || (!isNewProduct && !selectedProductId) || (isNewProduct && !newProductName)}
+                                onClick={() => setStep(2)}
+                                className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-lg active:scale-95 ml-auto"
+                            >
+                                次へ進む（画像登録）
                             </button>
                         </div>
                     </div>
@@ -187,10 +321,11 @@ export const ImageUpload: React.FC = () => {
                 {step === 2 && (
                     <div className="space-y-6">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">画像タイトル</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
+                                画像タイトル <span className="text-[9px] font-medium opacity-40 ml-1">(任意)</span>
+                            </label>
                             <input
                                 type="text"
-                                required
                                 placeholder="例: メインバナー、正方形サムネイルなど"
                                 className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none font-bold text-slate-700 text-sm focus:bg-white transition-all"
                                 value={title}
@@ -227,7 +362,7 @@ export const ImageUpload: React.FC = () => {
                                     </div>
                                     <p className="font-bold text-slate-900 text-sm">クリックしてアップロード</p>
                                     <p className="text-[11px] text-slate-400 font-bold mt-1">またはドラッグ＆ドロップ</p>
-                                    <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest mt-4">PNG, JPG up to 10MB</p>
+                                    <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest mt-4">PNG, JPG up to 10MB <span className="text-slate-200">(任意)</span></p>
                                     <input 
                                         id="file-upload" 
                                         type="file" 
@@ -266,75 +401,15 @@ export const ImageUpload: React.FC = () => {
                             </button>
                             <button
                                 type="submit"
-                                disabled={!file || !title}
+                                disabled={!projectName || !selectedMunicipalityId || (isNewProduct && (!newProductName || !selectedBusinessId)) || (!isNewProduct && !selectedProductId)}
                                 className="px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-lg active:scale-95 font-bold text-[11px]"
                             >
-                                画像を登録する
+                                {file || title ? '登録する' : 'プロジェクトのみ登録する'}
                             </button>
                         </div>
                     </div>
                 )}
             </form>
-          </div>
-        </div>
-
-        {/* AI Insight Widget */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-600/20 rounded-full blur-3xl -mr-12 -mt-12 transition-all group-hover:bg-indigo-600/40"></div>
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-indigo-400">
-                  <Brain size={16} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-[12px] tracking-tight leading-none mb-0.5">AI 提出前チェック</h3>
-                  <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest">Powered by Insight AI</p>
-                </div>
-              </div>
-
-              {!municipalityInsight ? (
-                <div className="py-6 text-center space-y-3">
-                  <div className="w-8 h-8 border-2 border-white/5 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
-                  <p className="text-[10px] font-bold text-white/30">自治体を選択してください...</p>
-                </div>
-              ) : (
-                <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-500">
-                  <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <ThumbsUp size={14} className="text-emerald-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Success Tip</span>
-                    </div>
-                    <p className="text-xs font-bold leading-relaxed">{municipalityInsight.tip}</p>
-                  </div>
-                  <div className="p-3 bg-rose-500/10 rounded-xl border border-rose-500/20">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle size={14} className="text-rose-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">Rejection Risk</span>
-                    </div>
-                    <p className="text-xs font-bold leading-relaxed text-rose-100">{municipalityInsight.risk}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-premium">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-              <Sparkles size={12} /> 制作ガイドライン
-            </h3>
-            <div className="space-y-3">
-              {[
-                { label: '配色', text: '自治体指定のアクセントカラーを30%以上使用' },
-                { label: '文字', text: '寄付金額は白枠+黒影で視認性を確保' },
-                { label: '権利', text: '人物・景観写真の権利元を必ず明記' },
-              ].map((item, i) => (
-                <div key={i} className="flex gap-4">
-                  <span className="text-[10px] font-black text-slate-300 uppercase shrink-0 pt-0.5">{item.label}</span>
-                  <p className="text-[11px] font-bold text-slate-600 leading-snug">{item.text}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

@@ -14,6 +14,9 @@ import { BusinessList } from './pages/BusinessList';
 import { BusinessForm } from './pages/BusinessForm';
 import { ProductList } from './pages/ProductList';
 import { ProductForm } from './pages/ProductForm';
+import { ProductDetail } from './pages/ProductDetail';
+import { ProjectForm } from './pages/ProjectForm';
+import { ProjectListEdit } from './pages/ProjectListEdit';
 
 import { AccountSettings } from './pages/AccountSettings';
 import { NotificationList } from './pages/NotificationList';
@@ -47,6 +50,7 @@ const App: React.FC = () => {
             <Route path="images" element={<ImageList />} />
             <Route path="revisions" element={<ImageRevisionList />} />
             <Route path="revisions/:id" element={<ImageDetail />} />
+            <Route path="revisions/:id/edit" element={<ProjectListEdit />} />
             <Route path="images/new" element={<ImageUpload />} />
             <Route path="municipalities" element={<MunicipalityList />} />
             <Route path="municipalities/new" element={<MunicipalityForm />} />
@@ -56,7 +60,9 @@ const App: React.FC = () => {
             <Route path="businesses/:id/edit" element={<BusinessForm />} />
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/:id" element={<ProductDetail />} />
             <Route path="products/:id/edit" element={<ProductForm />} />
+            <Route path="projects/:id/edit" element={<ProjectForm />} />
             <Route path="users" element={<AccountSettings />} />
           </Route>
 
@@ -68,12 +74,15 @@ const App: React.FC = () => {
             <Route path="images" element={<ImageList />} />
             <Route path="revisions" element={<ImageRevisionList />} />
             <Route path="revisions/:id" element={<ImageDetail />} />
+            <Route path="revisions/:id/edit" element={<ProjectListEdit />} />
             <Route path="businesses" element={<BusinessList />} />
             <Route path="businesses/new" element={<BusinessForm />} />
             <Route path="businesses/:id/edit" element={<BusinessForm />} />
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/:id" element={<ProductDetail />} />
             <Route path="products/:id/edit" element={<ProductForm />} />
+            <Route path="projects/:id/edit" element={<ProjectForm />} />
             <Route path="users" element={<AccountSettings />} />
           </Route>
 
@@ -84,7 +93,9 @@ const App: React.FC = () => {
             <Route path="images" element={<ImageList />} />
             <Route path="revisions" element={<ImageRevisionList />} />
             <Route path="revisions/:id" element={<ImageDetail />} />
+            <Route path="revisions/:id/edit" element={<ProjectListEdit />} />
             <Route path="products" element={<ProductList />} />
+            <Route path="projects/:id/edit" element={<ProjectForm />} />
             <Route path="users" element={<AccountSettings />} />
           </Route>
 

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { mockDb } from '../services/mockDb';
 import { StatusBadge } from '../components/StatusBadge';
 import { ImageEntity, Comment, ImageStatus } from '../types';
-import { canApproveImage } from '../utils/permissions';
+import { canApproveImage, canUploadImage } from '../utils/permissions';
 import { 
   Send, 
   ArrowLeft, 
@@ -58,6 +58,10 @@ export const ImageDetail: React.FC = () => {
   const [compareVersionB, setCompareVersionB] = useState<{imageId: number, versionId: number} | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadPreviewUrl, setUploadPreviewUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const isBusinessUser = currentUser?.role === 'business_user';
 
@@ -237,6 +241,48 @@ export const ImageDetail: React.FC = () => {
     setTimeout(() => setCopyFeedback(null), 2000);
   };
 
+  const handleUploadDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleUploadDragLeave = () => setIsDragging(false);
+
+  const handleUploadDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processUploadFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleUploadFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processUploadFile(e.target.files[0]);
+    }
+  };
+
+  const processUploadFile = (f: File) => {
+    if (!f.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください');
+      return;
+    }
+    setUploadFile(f);
+    const url = URL.createObjectURL(f);
+    setUploadPreviewUrl(url);
+  };
+
+  const handleUploadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadPreviewUrl || !image) return;
+
+    mockDb.addImageVersion(image.id, uploadPreviewUrl);
+    setShowUploadModal(false);
+    setUploadFile(null);
+    setUploadPreviewUrl(null);
+    fetchData();
+  };
+
   const basePath = currentUser.role === 'municipality_user' ? '/municipality' : currentUser.role === 'business_user' ? '/business' : '/admin';
 
   return (
@@ -357,9 +403,12 @@ export const ImageDetail: React.FC = () => {
               <button className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-xl font-bold text-[10px] hover:bg-slate-50 transition-all shadow-sm active:scale-95">
                 <Download size={14} /> 保存
               </button>
-              {!isBusinessUser && (
-                <button className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-xl font-bold text-[10px] hover:bg-slate-800 transition-all shadow-lg active:scale-95">
-                  <UploadCloud size={14} /> 修正版アップ
+              {canUploadImage(currentUser) && (
+                <button 
+                  onClick={() => setShowUploadModal(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-xl font-bold text-[10px] hover:bg-slate-800 transition-all shadow-lg active:scale-95"
+                >
+                  <UploadCloud size={14} /> 画像アップロード
                 </button>
               )}
             </div>
@@ -622,6 +671,109 @@ export const ImageDetail: React.FC = () => {
                 <Check size={16} className="text-emerald-400" />
                 {copyFeedback}
             </div>
+        </div>
+      )}
+
+      {/* 画像アップロードモーダル */}
+      {showUploadModal && (
+        <div 
+          className="fixed inset-0 z-[2000] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-300"
+          onClick={() => {
+            setShowUploadModal(false);
+            setUploadFile(null);
+            setUploadPreviewUrl(null);
+          }}
+        >
+          <div 
+            className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black text-slate-900 tracking-tighter">修正版をアップロード</h2>
+              <button
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setUploadFile(null);
+                  setUploadPreviewUrl(null);
+                }}
+                className="p-2 text-slate-400 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUploadSubmit} className="space-y-6">
+              <div 
+                className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
+                  isDragging ? 'border-accent bg-blue-50/50' : 'border-slate-300 hover:border-slate-400 bg-slate-50/50'
+                }`}
+                onDragOver={handleUploadDragOver}
+                onDragLeave={handleUploadDragLeave}
+                onDrop={handleUploadDrop}
+                onClick={() => !uploadFile && document.getElementById('upload-file-input')?.click()}
+              >
+                {!uploadFile ? (
+                  <>
+                    <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-4 text-slate-300 shadow-sm border border-slate-200">
+                      <UploadCloud size={32} />
+                    </div>
+                    <p className="font-bold text-slate-900 text-base mb-1">クリックしてアップロード</p>
+                    <p className="text-sm text-slate-400 font-bold">またはドラッグ＆ドロップ</p>
+                    <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-4">PNG, JPG up to 10MB</p>
+                    <input 
+                      id="upload-file-input" 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleUploadFileSelect}
+                    />
+                  </>
+                ) : (
+                  <div className="relative group w-full max-w-md animate-in zoom-in duration-300">
+                    <img src={uploadPreviewUrl!} alt="Preview" className="w-full h-auto rounded-xl shadow-xl max-h-[400px] object-contain bg-checkered ring-4 ring-white" />
+                    <button 
+                      type="button"
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setUploadFile(null); 
+                        setUploadPreviewUrl(null); 
+                      }}
+                      className="absolute -top-3 -right-3 p-2 bg-rose-500 text-white rounded-xl shadow-lg hover:bg-rose-600 transition-all border-2 border-white active:scale-90"
+                    >
+                      <X size={16} strokeWidth={3} />
+                    </button>
+                    <div className="mt-4 flex items-center justify-center gap-2 text-sm font-bold text-slate-400">
+                      <FileImage size={16} />
+                      <span>{uploadFile.name}</span>
+                      <span className="text-slate-200">/</span>
+                      <span>{(uploadFile.size / 1024).toFixed(0)} KB</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUploadModal(false);
+                    setUploadFile(null);
+                    setUploadPreviewUrl(null);
+                  }}
+                  className="px-6 py-2.5 text-slate-400 bg-slate-50 hover:bg-slate-100 rounded-xl font-bold text-sm transition-all"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="submit"
+                  disabled={!uploadFile}
+                  className="px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:bg-slate-100 disabled:text-slate-300 transition-all shadow-lg active:scale-95 font-bold text-sm"
+                >
+                  アップロード
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

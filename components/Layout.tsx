@@ -14,7 +14,7 @@ import {
   User as UserIcon,
   Image as ImageIcon,
   BarChart3,
-
+  FolderTree,
   History,
   ChevronLeft,
   ChevronRight

@@ -67,6 +67,7 @@ export interface Product {
   temperature_range?: TemperatureRange;
   has_materials?: boolean;
   portals?: string[];
+  system_admin_id?: number;
 }
 
 export interface ImageVersion {

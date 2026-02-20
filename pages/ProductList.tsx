@@ -4,6 +4,7 @@ import { mockDb, BUSINESSES, PORTALS, MUNICIPALITIES, PRODUCTS } from '../servic
 import { useAuth } from '../context/AuthContext';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Search, Plus, Edit, ArrowRight, ChevronRight, MapPin, Tag, Calendar, ExternalLink, Clock } from 'lucide-react';
+import { canUploadImage } from '../utils/permissions';
 
 export const ProductList: React.FC = () => {
   const { currentUser } = useAuth();
@@ -75,6 +76,7 @@ export const ProductList: React.FC = () => {
   });
 
   const basePath = currentUser?.role === 'municipality_user' ? '/municipality' : '/admin';
+  const canCreate = canUploadImage(currentUser) || currentUser?.role === 'municipality_user';
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700 h-full flex flex-col">
@@ -83,9 +85,11 @@ export const ProductList: React.FC = () => {
           <h1 className="text-xl font-black text-slate-900 tracking-tighter">商品一覧</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Link to={`${basePath}/products/new`} className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl active:scale-95">
-            <Plus size={20} /> 新規登録
-          </Link>
+          {canCreate && (
+            <Link to={`${basePath}/products/new`} className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl active:scale-95">
+              <Plus size={20} /> 新規登録
+            </Link>
+          )}
         </div>
       </div>
 
@@ -204,13 +208,21 @@ export const ProductList: React.FC = () => {
                     </td>
                     <td className="px-4 py-4 text-center border-b border-slate-50/50">
                       <div className="flex items-center justify-center gap-2">
-                        <Link 
-                          to={`${basePath}/products/${p.id}/edit`} 
-                          className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap"
-                        >
-                          <Edit size={12} />
-                          編集
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          <Link 
+                            to={`${basePath}/products/${p.id}`} 
+                            className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap"
+                          >
+                            詳細
+                          </Link>
+                          <Link 
+                            to={`${basePath}/products/${p.id}/edit`} 
+                            className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap"
+                          >
+                            <Edit size={12} />
+                            編集
+                          </Link>
+                        </div>
                       </div>
                     </td>
                   </tr>
