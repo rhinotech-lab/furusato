@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { mockDb, MUNICIPALITIES, BUSINESSES, PRODUCTS } from '../services/mockDb';
 import { ArrowLeft, UploadCloud, FileImage, X, Brain, Sparkles, AlertTriangle, ThumbsUp, Link as LinkIcon } from 'lucide-react';
+import { canUploadImage } from '../utils/permissions';
 
 export const ImageUpload: React.FC = () => {
   const navigate = useNavigate();

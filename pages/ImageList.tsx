@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { mockDb, MUNICIPALITIES, BUSINESSES, PRODUCTS } from '../services/mockDb';
 import { StatusBadge } from '../components/StatusBadge';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { canApproveImage } from '../utils/permissions';
 import { 
   Search, Plus, Calendar, CheckCircle2, CheckSquare, 
   Square, X, MousePointerClick, ImageIcon, 
@@ -111,13 +112,14 @@ export const ImageList: React.FC = () => {
   const isAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'creator';
 
   const pendingImages = filteredImages.filter(img => img.latestVersion.status === 'pending_review');
-  const allPendingSelected = pendingImages.length > 0 && pendingImages.every(img => selectedIds.has(img.id));
+  const approvableImages = currentUser ? pendingImages.filter(img => canApproveImage(currentUser, img)) : [];
+  const allPendingSelected = approvableImages.length > 0 && approvableImages.every(img => selectedIds.has(img.id));
 
   const toggleSelectAllPending = () => {
     if (allPendingSelected) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(pendingImages.map(img => img.id)));
+      setSelectedIds(new Set(approvableImages.map(img => img.id)));
     }
   };
 
@@ -295,9 +297,9 @@ export const ImageList: React.FC = () => {
           <option value="rejected">差し戻し</option>
           <option value="revising">修正中</option>
         </select>
-        {pendingImages.length > 0 && (
+        {approvableImages.length > 0 && (
           <button onClick={toggleSelectAllPending} className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl text-xs font-black transition-all border ${allPendingSelected ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-blue-50 text-accent border-blue-100 shadow-sm shadow-blue-100/50'}`}>
-            <MousePointerClick size={16} /> {allPendingSelected ? '全解除' : `全選択 (${pendingImages.length})`}
+            <MousePointerClick size={16} /> {allPendingSelected ? '全解除' : `全選択 (${approvableImages.length})`}
           </button>
         )}
       </div>
@@ -362,7 +364,7 @@ export const ImageList: React.FC = () => {
                     <tr key={img.id} className={`group transition-all ${isSelected ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}>
                       {/* チェックボックス */}
                       <td className="pl-3 pr-1 py-3 text-center border-b border-slate-50/50">
-                         {img.latestVersion.status === 'pending_review' ? (
+                         {img.latestVersion.status === 'pending_review' && currentUser && canApproveImage(currentUser, img) ? (
                            <button onClick={() => toggleSelect(img.id)} className="transition-transform active:scale-90">{isSelected ? <CheckSquare size={16} className="text-accent" /> : <Square size={16} className="text-slate-200" />}</button>
                          ) : <div className="w-4 h-4 mx-auto opacity-5"><Square size={16} /></div>}
                       </td>

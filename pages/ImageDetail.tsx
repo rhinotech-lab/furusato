@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { mockDb } from '../services/mockDb';
 import { StatusBadge } from '../components/StatusBadge';
 import { ImageEntity, Comment, ImageStatus } from '../types';
+import { canApproveImage } from '../utils/permissions';
 import { 
   Send, 
   ArrowLeft, 
@@ -177,6 +178,9 @@ export const ImageDetail: React.FC = () => {
   const product = mockDb.getProductById(image.product_id);
   const business = product ? mockDb.getBusinessById(product.business_id) : null;
   const currentVersion = image.versions.find(v => v.id === selectedVersionId) || image.versions[image.versions.length - 1];
+  
+  // 承認権限チェック
+  const canApprove = canApproveImage(currentUser, image);
 
   const compareVersionAObj = isCompareMode && compareVersionA 
     ? allCompareVersions.find(v => v.imageId === compareVersionA.imageId && v.versionId === compareVersionA.versionId)
@@ -287,15 +291,14 @@ export const ImageDetail: React.FC = () => {
               </button>
               
               <div className="flex items-center gap-3">
+                {canApprove ? (
                 <div className="relative">
                   <button 
-                    onClick={() => !isBusinessUser && setIsStatusMenuOpen(!isStatusMenuOpen)}
-                    className={`flex items-center gap-1.5 px-3 py-0.5 rounded-lg border font-black text-[10px] uppercase tracking-widest transition-all ${
-                      isBusinessUser ? 'bg-slate-50 text-slate-400 cursor-default' : 'hover:bg-slate-50 shadow-sm'
-                    }`}
+                    onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
+                    className="flex items-center gap-1.5 px-3 py-0.5 rounded-lg border font-black text-[10px] uppercase tracking-widest transition-all hover:bg-slate-50 shadow-sm"
                   >
                     <StatusBadge status={currentVersion.status} />
-                    {!isBusinessUser && <ChevronDown size={12} className={`transition-transform ${isStatusMenuOpen ? 'rotate-180' : ''}`} />}
+                    <ChevronDown size={12} className={`transition-transform ${isStatusMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {isStatusMenuOpen && (
@@ -313,6 +316,9 @@ export const ImageDetail: React.FC = () => {
                     </div>
                   )}
                 </div>
+                ) : (
+                  <StatusBadge status={currentVersion.status} />
+                )}
                 <h1 className="text-xl font-black text-slate-900 tracking-tighter truncate leading-none">{image.title}</h1>
               </div>
 
@@ -508,6 +514,7 @@ export const ImageDetail: React.FC = () => {
       </div>
 
       {/* Column 4: メッセージ */}
+      {!isBusinessUser && (
       <aside className="w-[360px] bg-white border-l border-slate-100 flex flex-col shadow-2xl z-30">
         <div className="p-4 border-b border-slate-50 shrink-0 flex items-center justify-between bg-white">
           <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
@@ -583,6 +590,7 @@ export const ImageDetail: React.FC = () => {
           <p className="text-[8px] text-slate-300 mt-2 text-center font-bold uppercase tracking-widest">⌘ + ENTER で送信</p>
         </div>
       </aside>
+      )}
 
       {/* モーダル表示 */}
       {isZoomOpen && (
