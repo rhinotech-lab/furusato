@@ -19,7 +19,7 @@ export const AlertList: React.FC = () => {
 
         if (!p.deadline) return false;
         const deadlineDate = new Date(p.deadline);
-        // 期限超過、または未読コメントがある案件
+        // 期限超過、または未読コメントがあるプロジェクト
         return deadlineDate < today || (p.unread_comments_count || 0) > 0;
     }).sort((a, b) => {
         const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
@@ -79,7 +79,7 @@ export const AlertList: React.FC = () => {
         <div className="flex flex-col min-w-0">
           <h1 className="text-xl font-black text-slate-900 tracking-tighter flex items-center gap-2">
               <AlertTriangle className="text-rose-500" size={20} />
-              要対応案件
+              要対応プロジェクト
           </h1>
         </div>
 
@@ -103,7 +103,7 @@ export const AlertList: React.FC = () => {
         </div>
         <div className="flex-1">
             <p className="text-rose-900 font-black text-sm">
-              現在、<span className="text-lg mx-1">{alertedProducts.length}</span>件の案件でアクションが必要です
+              現在、<span className="text-lg mx-1">{alertedProducts.length}</span>件のプロジェクトでアクションが必要です
             </p>
             <p className="text-rose-700/60 text-[10px] font-bold leading-relaxed">
               返信または承認・差し戻しの判定を優先的に行ってください。
@@ -126,7 +126,7 @@ export const AlertList: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {alertedProducts.length === 0 ? (
-                <tr><td colSpan={6} className="px-8 py-20 text-center text-slate-300 font-black">現在、対応が必要な案件はありません</td></tr>
+                <tr><td colSpan={6} className="px-8 py-20 text-center text-slate-300 font-black">現在、対応が必要なプロジェクトはありません</td></tr>
               ) : alertedProducts.map(p => {
                 const business = BUSINESSES.find(b => b.id === p.business_id);
                 const deadlineInfo = getDeadlineConfig(p.deadline);

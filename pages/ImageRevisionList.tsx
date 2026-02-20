@@ -86,7 +86,7 @@ export const ImageRevisionList: React.FC = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
           <input 
             type="text" 
-            placeholder="案件名・商品名で検索..." 
+            placeholder="プロジェクト名・商品名で検索..." 
             className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border-0 rounded-xl outline-none focus:bg-white transition-all text-sm font-bold" 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
@@ -130,7 +130,7 @@ export const ImageRevisionList: React.FC = () => {
             <thead className="sticky top-0 z-20">
               <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
                 <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-32">最新ステータス</th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">案件タイトル / 商品</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">プロジェクトタイトル / 商品</th>
                 <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-20">版数</th>
                 <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-28">最終更新</th>
                 <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest w-24 border-b border-slate-100 text-center">操作</th>
@@ -138,7 +138,7 @@ export const ImageRevisionList: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {revisionList.length === 0 ? (
-                  <tr><td colSpan={5} className="px-8 py-10 text-center text-slate-300 font-bold">該当する改修案件はありません</td></tr>
+                  <tr><td colSpan={5} className="px-8 py-10 text-center text-slate-300 font-bold">該当する改修プロジェクトはありません</td></tr>
               ) : revisionList.map(item => (
                 <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-6 py-4 border-b border-slate-50/50">

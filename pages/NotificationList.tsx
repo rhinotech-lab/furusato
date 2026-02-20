@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { mockDb } from '../services/mockDb';
-import { Bell, MessageCircle, RefreshCw, ChevronRight, Clock, CheckCircle2 } from 'lucide-react';
+import { Bell, MessageCircle, RefreshCw, ChevronRight, Clock, CheckCircle2, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const NotificationList: React.FC = () => {
@@ -13,13 +13,47 @@ export const NotificationList: React.FC = () => {
 
   const markAllAsRead = () => {
     mockDb.markNotificationsAsRead();
-    setNotifications(mockDb.getNotifications());
+    // 新しい配列を作成してReactに変更を認識させる
+    setNotifications([...mockDb.getNotifications()]);
+    // カスタムイベントを発火してLayoutに通知
+    window.dispatchEvent(new Event('notificationUpdated'));
   };
 
   const getIcon = (title: string) => {
     if (title.includes('メッセージ') || title.includes('コメント')) return <MessageCircle size={18} className="text-blue-500" />;
     if (title.includes('ステータス')) return <RefreshCw size={18} className="text-emerald-500" />;
     return <Bell size={18} className="text-slate-400" />;
+  };
+
+  // メッセージから画像タイトルを抽出して画像IDを取得
+  const getImageIdFromMessage = (message: string): number | null => {
+    // 「」で囲まれた部分を抽出（例：「2026年2月　肉類系」）
+    const match = message.match(/「([^」]+)」/);
+    if (!match) return null;
+    
+    const imageTitle = match[1];
+    const images = mockDb.getImages();
+    const image = images.find(img => img.title === imageTitle);
+    
+    return image ? image.id : null;
+  };
+
+  // 通知を既読にする
+  const handleViewDetails = (notificationId: number) => {
+    mockDb.markNotificationAsRead(notificationId);
+    // 新しい配列を作成してReactに変更を認識させる
+    setNotifications([...mockDb.getNotifications()]);
+    // カスタムイベントを発火してLayoutに通知
+    window.dispatchEvent(new Event('notificationUpdated'));
+  };
+
+  // 通知を未読に戻す
+  const handleMarkAsUnread = (notificationId: number) => {
+    mockDb.markNotificationAsUnread(notificationId);
+    // 新しい配列を作成してReactに変更を認識させる
+    setNotifications([...mockDb.getNotifications()]);
+    // カスタムイベントを発火してLayoutに通知
+    window.dispatchEvent(new Event('notificationUpdated'));
   };
 
   return (
@@ -68,16 +102,33 @@ export const NotificationList: React.FC = () => {
                   </div>
                   <p className="text-slate-500 text-[12px] leading-relaxed mb-2">{n.message}</p>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-300">
-                      <Clock size={10} />
-                      {new Date(n.created_at).toLocaleString('ja-JP')}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200">
+                      <Clock size={12} className="text-slate-500" />
+                      <span className="text-[11px] font-black text-slate-700 font-mono">
+                        {new Date(n.created_at).toLocaleString('ja-JP')}
+                      </span>
                     </div>
-                    <Link 
-                      to={`${basePath}/images/1`} 
-                      className="text-[9px] font-black text-accent hover:underline flex items-center gap-0.5"
-                    >
-                      詳細を見る <ChevronRight size={10} />
-                    </Link>
+                    {(() => {
+                      const imageId = getImageIdFromMessage(n.message);
+                      return imageId ? (
+                        <Link 
+                          to={`${basePath}/revisions/${imageId}`} 
+                          onClick={() => handleViewDetails(n.id)}
+                          className="text-[9px] font-black text-accent hover:underline flex items-center gap-0.5"
+                        >
+                          詳細を見る <ChevronRight size={10} />
+                        </Link>
+                      ) : null;
+                    })()}
+                    {n.is_read && (
+                      <button
+                        onClick={() => handleMarkAsUnread(n.id)}
+                        className="text-[9px] font-black text-slate-500 hover:text-slate-700 flex items-center gap-0.5 transition-colors"
+                        title="未読に戻す"
+                      >
+                        <RotateCcw size={10} /> 未読に戻す
+                      </button>
+                    )}
                   </div>
                 </div>
 

@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -26,7 +26,28 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [notifications] = useState(mockDb.getNotifications());
+  const [notifications, setNotifications] = useState(mockDb.getNotifications());
+
+  // 通知が更新されたときに再取得
+  useEffect(() => {
+    const handleNotificationUpdate = () => {
+      // 新しい配列を作成してReactに変更を認識させる
+      setNotifications([...mockDb.getNotifications()]);
+    };
+
+    // カスタムイベントをリッスン
+    window.addEventListener('notificationUpdated', handleNotificationUpdate);
+    
+    // 定期的に通知を再取得（フォールバック）
+    const interval = setInterval(() => {
+      setNotifications([...mockDb.getNotifications()]);
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('notificationUpdated', handleNotificationUpdate);
+      clearInterval(interval);
+    };
+  }, []);
 
   if (!currentUser) return <>{children}</>;
 
@@ -75,7 +96,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { label: '事業者一覧', path: `${basePath}/businesses`, icon: <Store size={18} />, roles: ['super_admin', 'municipality_user', 'creator'], badge: null },
 
     { label: '商品一覧', path: `${basePath}/products`, icon: <ShoppingBag size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },
-    { label: '案件一覧', path: `${basePath}/images`, icon: <ImageIcon size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },
+    { label: 'プロジェクト一覧', path: `${basePath}/images`, icon: <ImageIcon size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },
     { label: '設定', path: `${basePath}/users`, icon: <SettingsIcon size={18} />, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], badge: null },
   ];
 

@@ -15,7 +15,7 @@ export const ReportGenerator: React.FC = () => {
   const images = mockDb.getImages();
   const municipality = currentUser?.municipality_id ? mockDb.getMunicipalityById(currentUser.municipality_id) : null;
 
-  // 承認済みかつ指定月の案件を抽出
+  // 承認済みかつ指定月のプロジェクトを抽出
   const approvedImages = useMemo(() => {
     return images.filter(img => {
       const latest = img.versions[img.versions.length - 1];
@@ -85,12 +85,12 @@ export const ReportGenerator: React.FC = () => {
                           <p className="text-[15px] font-black text-slate-900">{selectedMonth.replace('-', '年')}月分</p>
                       </div>
                       <div className="bg-slate-50 p-4 rounded-[1.5rem] border border-slate-100">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">完了案件数</p>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">完了プロジェクト数</p>
                           <p className="text-[15px] font-black text-slate-900">{approvedImages.length} <span className="text-[10px] font-bold">件</span></p>
                       </div>
                       <div className="bg-slate-50 p-4 rounded-[1.5rem] border border-slate-100">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">平均修正回数</p>
-                          <p className="text-[15px] font-black text-slate-900">1.4 <span className="text-[10px] font-bold">回 / 案件</span></p>
+                          <p className="text-[15px] font-black text-slate-900">1.4 <span className="text-[10px] font-bold">回 / プロジェクト</span></p>
                       </div>
                   </div>
 
@@ -205,7 +205,7 @@ export const ReportGenerator: React.FC = () => {
                   </button>
                   {approvedImages.length === 0 && (
                       <p className="text-center text-[10px] font-black text-rose-500 uppercase tracking-widest mt-4">
-                          選択した月に承認済みの案件がありません
+                          選択した月に承認済みのプロジェクトがありません
                       </p>
                   )}
               </div>
@@ -218,7 +218,7 @@ export const ReportGenerator: React.FC = () => {
                 <h3 className="text-[14px] font-black text-slate-900 tracking-tight italic">事務作業をゼロにして、<br/>もっと「考える」時間へ。</h3>
                 <p className="text-[11px] text-slate-500 font-bold leading-relaxed">
                     毎月末の「比較資料作り」に追われる必要はありません。
-                    システムが全案件のデータを集め、決裁ルートにそのまま回せる高品質なフォーマットで出力します。
+                    システムが全プロジェクトのデータを集め、決裁ルートにそのまま回せる高品質なフォーマットで出力します。
                 </p>
               </div>
 
@@ -236,7 +236,7 @@ export const ReportGenerator: React.FC = () => {
       </div>
 
       <div className="pt-4">
-        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">対象予定の案件 ({approvedImages.length}件)</h3>
+        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">対象予定のプロジェクト ({approvedImages.length}件)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {approvedImages.map(img => (
                 <div key={img.id} className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3 transition-all hover:shadow-md">

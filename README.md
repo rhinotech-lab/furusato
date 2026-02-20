@@ -18,7 +18,7 @@
 - 最新の更新状況一覧（事業者名・期限・更新日付き）
 - 各案件への直接リンク
 
-### 案件一覧
+### プロジェクト一覧
 - バナー画像の一括アップロード（CSV連携対応）
 - 案件ごとの進捗状況管理
 - ステータス管理（制作中、承認待ち、承認済みなど）
@@ -102,7 +102,7 @@
    ```bash
    # Composerの依存関係をインストール
    docker compose exec backend composer install
-
+   
    # アプリケーションキーを生成
    docker compose exec backend php artisan key:generate
 
@@ -111,10 +111,10 @@
 
    # Sanctumのマイグレーションを公開
    docker compose exec backend php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
-
+   
    # データベースマイグレーション
    docker compose exec backend php artisan migrate
-
+   
    # シーダーを実行（サンプルユーザーを作成）
    docker compose exec backend php artisan db:seed
    ```
@@ -167,7 +167,7 @@
 | 自治体一覧 | `/admin/municipalities` | 自治体管理 |
 | 事業者一覧 | `/admin/businesses` | 事業者管理 |
 | 商品一覧 | `/admin/products` | 商品管理 |
-| 案件一覧 | `/admin/images` | 案件管理 |
+| プロジェクト一覧 | `/admin/images` | プロジェクト管理 |
 | 画像改修状況 | `/admin/revisions` | 改修一覧 |
 | 画像詳細 | `/admin/revisions/:id` | 画像詳細・チャット |
 | 新規画像登録 | `/admin/images/new` | 画像アップロード |

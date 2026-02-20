@@ -176,7 +176,7 @@ export const ImageCollection: React.FC = () => {
                             </button>
                         ) : (
                             <Link to={`${basePath}/images?productId=${item.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95 whitespace-nowrap">
-                                <FileCheck size={12} /> 案件確認
+                                <FileCheck size={12} /> プロジェクト確認
                             </Link>
                         )}
                     </div>

@@ -42,8 +42,8 @@ export const MunicipalityForm: React.FC = () => {
         </button>
         <div>
           <h1 className="text-xl font-black text-slate-900 tracking-tighter">
-            {isEdit ? '自治体情報の編集' : '自治体の新規登録'}
-          </h1>
+          {isEdit ? '自治体情報の編集' : '自治体の新規登録'}
+        </h1>
         </div>
       </div>
 

@@ -256,7 +256,7 @@ export const ImageList: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-700 relative h-full flex flex-col">
       <div className="flex justify-between items-center shrink-0">
         <div className="flex flex-col">
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter">案件一覧</h1>
+            <h1 className="text-xl font-black text-slate-900 tracking-tighter">プロジェクト一覧</h1>
         </div>
         
         <div className="flex items-center gap-4">
@@ -281,7 +281,7 @@ export const ImageList: React.FC = () => {
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
           <input 
             type="text" 
-            placeholder="案件名・自治体名で検索..." 
+            placeholder="プロジェクト名・自治体名で検索..." 
             className="w-full pl-14 pr-5 py-3.5 bg-slate-50 border-0 rounded-2xl outline-none focus:bg-white transition-all text-sm font-bold text-slate-700" 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
@@ -323,7 +323,7 @@ export const ImageList: React.FC = () => {
         {filteredImages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-300 gap-4 bg-white rounded-[1.5rem] border border-slate-100 shadow-sm">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center"><ImageIcon size={32} className="opacity-10" /></div>
-              <p className="font-bold text-[14px] tracking-tight">対象の案件が見つかりませんでした</p>
+              <p className="font-bold text-[14px] tracking-tight">対象のプロジェクトが見つかりませんでした</p>
           </div>
         ) : (
           <div className="bg-white rounded-[1.5rem] shadow-premium border border-slate-100 overflow-hidden">
@@ -343,7 +343,7 @@ export const ImageList: React.FC = () => {
                 <tr className="bg-white/95 backdrop-blur-sm text-slate-400 text-[10px] font-black uppercase tracking-widest shadow-sm">
                   <th className="pl-3 pr-1 py-3 text-center border-b border-slate-100"></th>
                   <th className="px-1 py-3 text-center border-b border-slate-100">画像</th>
-                  <th className="px-2 py-3 border-b border-slate-100">案件 / 商品</th>
+                  <th className="px-2 py-3 border-b border-slate-100">プロジェクト / 商品</th>
                   <th className="px-2 py-3 border-b border-slate-100">{isAdmin ? '自治体 / 事業者' : '事業者'}</th>
                   <th className="px-2 py-3 border-b border-slate-100 text-center">商品数</th>
                   <th className="px-2 py-3 border-b border-slate-100 text-center">作成日 / 期限</th>
@@ -372,7 +372,7 @@ export const ImageList: React.FC = () => {
                            <img src={img.latestVersion.file_path} alt="" className="w-full h-full object-cover" />
                         </div>
                       </td>
-                      {/* 案件タイトル / 商品情報 */}
+                      {/* プロジェクトタイトル / 商品情報 */}
                       <td className="px-2 py-3 border-b border-slate-50/50 overflow-hidden">
                         <div className="flex flex-col min-w-0">
                             <span className="font-bold text-slate-800 text-[13px] truncate leading-tight group-hover:text-accent transition-colors">{img.title}</span>
@@ -457,7 +457,10 @@ export const ImageList: React.FC = () => {
                       </td>
                       {/* 詳細 */}
                       <td className="px-1 py-3 text-center border-b border-slate-50/50">
-                        <Link to={`${basePath}/revisions/${img.id}`} className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-lg hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn">
+                        <Link 
+                          to={`${basePath}/revisions/${img.id}`}
+                          className="inline-flex items-center justify-center w-6 h-6 bg-blue-50 text-accent rounded-lg hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95 group/btn"
+                        >
                           <ArrowRight size={12} className="group-hover/btn:translate-x-0.5 transition-transform" />
                         </Link>
                       </td>
@@ -494,7 +497,7 @@ export const ImageList: React.FC = () => {
                   <Upload size={24} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight">案件一括アップロード</h2>
+                  <h2 className="text-xl font-black text-slate-900 tracking-tight">プロジェクト一括アップロード</h2>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">CSV (URLs or Files) Bulk Import</p>
                 </div>
               </div>
@@ -528,7 +531,7 @@ export const ImageList: React.FC = () => {
                   <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-100 w-full max-w-2xl">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">CSV推奨フォーマット (6列)</p>
                       <code className="text-[10px] font-mono font-bold text-slate-600 block bg-white p-3 rounded-xl border border-slate-100 shadow-inner whitespace-nowrap overflow-hidden">
-                        商品名, 事業者ID, 案件タイトル, 外部リンクURL, 寄付金額, <span className="text-accent">画像ソース(URL or ファイル名)</span>
+                        商品名, 事業者ID, プロジェクトタイトル, 外部リンクURL, 寄付金額, <span className="text-accent">画像ソース(URL or ファイル名)</span>
                       </code>
                   </div>
                   

@@ -277,20 +277,20 @@ export const BusinessForm: React.FC = () => {
               </div>
             )}
             <div className="flex gap-3 ml-auto">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
                 className="px-6 py-2.5 text-slate-400 bg-slate-50 hover:bg-slate-100 rounded-xl font-bold text-sm transition-all"
-              >
-                キャンセル
-              </button>
-              <button
-                type="submit"
+            >
+              キャンセル
+            </button>
+            <button
+              type="submit"
                 className="flex items-center gap-1.5 px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 font-bold text-sm"
-              >
+            >
                 <Save size={14} />
-                保存する
-              </button>
+              保存する
+            </button>
             </div>
           </div>
         </form>

@@ -18,7 +18,6 @@
 
 | コンポーネント | 技術 | 説明 |
 |---|---|---|
-| フロントエンド | React 19 + Vite 6 | SPA（静的ビルド） |
 | バックエンド | Laravel 12 (PHP 8.3) | REST API |
 | データベース | MySQL 8.0 | Cloud SQL |
 | Webサーバー | Nginx | リバースプロキシ |

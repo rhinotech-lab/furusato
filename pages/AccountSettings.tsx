@@ -10,8 +10,6 @@ import {
   MoreVertical,
   X,
   AlertTriangle,
-  ListChecks,
-  Check,
   Sparkles,
   Loader2,
   RefreshCw,
@@ -21,12 +19,11 @@ import {
   Link as LinkIcon,
   UploadCloud,
   FileCheck,
-  Zap,
   CalendarDays
 } from 'lucide-react';
 import { ADMIN_USERS, MUNICIPALITY_USERS } from '../services/mockDb';
 
-type Tab = 'account' | 'team' | 'production' | 'system';
+type Tab = 'account' | 'team' | 'system';
 
 export const AccountSettings: React.FC = () => {
   const { currentUser } = useAuth();
@@ -39,7 +36,6 @@ export const AccountSettings: React.FC = () => {
   const tabs: { id: Tab; label: string; icon: any; roles: string[]; description: string }[] = [
     { id: 'account', label: 'アカウント', icon: UserIcon, roles: ['super_admin', 'creator', 'municipality_user', 'business_user'], description: '個人設定・通知' },
     { id: 'team', label: 'チーム管理', icon: Users, roles: ['super_admin', 'municipality_user'], description: '権限・メンバー招待' },
-    { id: 'production', label: '制作設定', icon: Zap, roles: ['creator'], description: '納期・規格・NG集' },
     { id: 'system', label: 'システム', icon: SettingsIcon, roles: ['super_admin'], description: '年度・自治体情報' },
   ];
 
@@ -78,7 +74,6 @@ export const AccountSettings: React.FC = () => {
           <div className="bg-white rounded-2xl border border-slate-200/60 shadow-premium overflow-hidden">
             {activeTab === 'account' && <AccountSection />}
             {activeTab === 'team' && <TeamSection />}
-            {activeTab === 'production' && <ProductionSection />}
             {activeTab === 'system' && <SystemSection />}
           </div>
         </div>
@@ -89,9 +84,18 @@ export const AccountSettings: React.FC = () => {
 
 const AccountSection: React.FC = () => {
   const { currentUser, appSettings, updateSettings } = useAuth();
+  const [isSaved, setIsSaved] = useState(false);
 
   const toggleEmailSetting = (key: 'emailNotifyOnUpload' | 'emailNotifyOnApprovalRequest' | 'emailIncludeDirectLinks') => {
     updateSettings({ [key]: !appSettings[key] });
+  };
+
+  const handleSave = () => {
+    // 保存処理をシミュレート
+    setIsSaved(true);
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 3000);
   };
 
   return (
@@ -179,9 +183,18 @@ const AccountSection: React.FC = () => {
       </div>
 
       <div className="p-6 flex justify-end bg-slate-50/50">
-        <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] shadow-lg active:scale-95 flex items-center gap-1.5 group">
+        {isSaved ? (
+          <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-[11px] shadow-lg animate-in zoom-in-95 duration-300">
+            <FileCheck size={14} /> 保存しました
+          </div>
+        ) : (
+          <button 
+            onClick={handleSave}
+            className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] shadow-lg active:scale-95 flex items-center gap-1.5 group hover:bg-slate-800 transition-all"
+          >
             <Save size={14} className="group-hover:scale-110 transition-transform" /> アカウント設定を保存
-        </button>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -252,179 +265,12 @@ const TeamSection: React.FC = () => {
   );
 };
 
-const ProductionSection: React.FC = () => {
-  const { appSettings, updateSettings } = useAuth();
-  
-  const [localSettings, setLocalSettings] = useState({
-    attentionDays: appSettings.attentionDays,
-    warningDays: appSettings.warningDays,
-    excludeHolidays: appSettings.excludeHolidays,
-    checklist: [...appSettings.checklist]
-  });
-  
-  const [newCheckItem, setNewCheckItem] = useState('');
-
-  const handleSave = () => {
-    updateSettings(localSettings);
-    alert('制作設定を保存しました。納期アラートが更新されます。');
-  };
-
-  const removeCheckItem = (index: number) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      checklist: prev.checklist.filter((_, i) => i !== index)
-    }));
-  };
-
-  const addCheckItem = () => {
-    if (!newCheckItem.trim()) return;
-    setLocalSettings(prev => ({
-      ...prev,
-      checklist: [...prev.checklist, newCheckItem]
-    }));
-    setNewCheckItem('');
-  };
-
-  const attentionOptions = [3, 5, 7, 10, 14, 21, 30];
-  const warningOptions = [1, 2, 3, 5, 7];
-
-  return (
-    <div className="divide-y divide-slate-100">
-      <div className="p-6 space-y-6">
-        <div className="flex justify-between items-start">
-            <div className="space-y-1">
-                <h3 className="text-[14px] font-bold text-slate-900 flex items-center gap-2 tracking-tight">
-                    <AlertTriangle size={16} className="text-rose-500" />
-                    納期アラートの定義
-                </h3>
-                <p className="text-[11px] text-slate-400 font-bold">案件が「注意」や「警告」になる閾値を設定します。</p>
-            </div>
-            <div className="flex items-center gap-2 p-1.5 bg-slate-50 rounded-xl border border-slate-100">
-                <button 
-                  onClick={() => setLocalSettings(prev => ({ ...prev, excludeHolidays: !prev.excludeHolidays }))}
-                  className={`w-10 h-5 rounded-full p-1 transition-all flex items-center ${localSettings.excludeHolidays ? 'bg-accent justify-end' : 'bg-slate-300 justify-start'}`}
-                >
-                    <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </button>
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">土日祝を除外</span>
-            </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 bg-amber-50 rounded-xl border border-amber-100 shadow-sm relative overflow-hidden">
-                <div className="absolute -right-4 -bottom-4 opacity-5">
-                   <AlertTriangle size={60} className="text-amber-500" />
-                </div>
-                <div className="relative z-10 flex items-center justify-between mb-4">
-                    <div className="px-2 py-0.5 bg-white text-amber-600 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm border border-amber-100">注意レベル (黄色)</div>
-                    <span className="text-xl font-black text-amber-900">{localSettings.attentionDays} <span className="text-[10px]">日前</span></span>
-                </div>
-                <div className="relative z-10 flex flex-col gap-2">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max={attentionOptions.length - 1} 
-                      step="1"
-                      value={attentionOptions.indexOf(localSettings.attentionDays)}
-                      onChange={(e) => setLocalSettings(prev => ({ ...prev, attentionDays: attentionOptions[parseInt(e.target.value)] }))}
-                      className="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-500 my-4" 
-                    />
-                    <div className="flex justify-between px-1">
-                        {attentionOptions.map((day, i) => (
-                            <span key={i} className={`text-[9px] font-black ${localSettings.attentionDays === day ? 'text-amber-600' : 'text-slate-300'}`}>
-                                {day}日
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            <div className="p-6 bg-rose-50 rounded-xl border border-rose-100 shadow-sm relative overflow-hidden">
-                <div className="absolute -right-4 -bottom-4 opacity-5">
-                   <AlertTriangle size={60} className="text-rose-500" />
-                </div>
-                <div className="relative z-10 flex items-center justify-between mb-4">
-                    <div className="px-2 py-0.5 bg-white text-rose-600 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm border border-rose-100">警告レベル (赤色)</div>
-                    <span className="text-xl font-black text-rose-900">{localSettings.warningDays} <span className="text-[10px]">日前</span></span>
-                </div>
-                <div className="relative z-10 flex flex-col gap-2">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max={warningOptions.length - 1} 
-                      step="1" 
-                      value={warningOptions.indexOf(localSettings.warningDays)}
-                      onChange={(e) => setLocalSettings(prev => ({ ...prev, warningDays: warningOptions[parseInt(e.target.value)] }))}
-                      className="w-full h-2 bg-rose-200 rounded-lg appearance-none cursor-pointer accent-rose-500 my-4" 
-                    />
-                    <div className="flex justify-between px-1">
-                        {warningOptions.map((day, i) => (
-                            <span key={i} className={`text-[9px] font-black ${localSettings.warningDays === day ? 'text-rose-600' : 'text-slate-300'}`}>
-                                {day}日
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        <div>
-            <h3 className="text-[14px] font-bold text-slate-900 flex items-center gap-2 tracking-tight">
-                <ListChecks size={16} className="text-emerald-500" />
-                提出前チェックリスト
-            </h3>
-            <p className="text-[11px] text-slate-400 font-bold">デザイナーがアップロードする際に表示される必須確認事項です。</p>
-        </div>
-        <div className="space-y-2">
-            {localSettings.checklist.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 group">
-                    <div className="w-5 h-5 rounded-md bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                        <Check size={12} strokeWidth={4} />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 flex-1">{item}</span>
-                    <button 
-                      onClick={() => removeCheckItem(i)}
-                      className="text-slate-200 hover:text-rose-500 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
-                </div>
-            ))}
-            <div className="flex items-center gap-3 pt-4">
-                <input 
-                  type="text" 
-                  placeholder="新しいチェック項目を追加..."
-                  value={newCheckItem}
-                  onChange={(e) => setNewCheckItem(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addCheckItem()}
-                  className="flex-1 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl px-4 py-2.5 text-[11px] font-bold outline-none focus:border-indigo-500/30 focus:bg-white transition-all"
-                />
-                <button 
-                  onClick={addCheckItem}
-                  className="p-2 bg-indigo-600 text-white rounded-xl shadow-lg hover:bg-indigo-700 active:scale-90 transition-all"
-                >
-                   <Plus size={14} />
-                </button>
-            </div>
-        </div>
-      </div>
-
-      <div className="p-6 flex justify-end">
-        <button 
-          onClick={handleSave}
-          className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] shadow-lg active:scale-95 flex items-center gap-1.5"
-        >
-          <Save size={14} /> 設定を反映させる
-        </button>
-      </div>
-    </div>
-  );
-};
 
 const SystemSection: React.FC = () => {
   const { currentFiscalYear, setFiscalYear } = useAuth();
   const [isSwitchingYear, setIsSwitchingYear] = useState<number | null>(null);
   const [switchProgress, setSwitchProgress] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
 
   const handleYearSwitch = async (targetYear: number) => {
     if (targetYear === currentFiscalYear) return;
@@ -529,13 +375,29 @@ const SystemSection: React.FC = () => {
             <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={14} />
             <div className="space-y-0.5">
                 <p className="text-[12px] font-bold text-amber-900 tracking-tight">年度更新時の注意事項</p>
-                <p className="text-[10px] text-amber-700/70 font-bold leading-relaxed">新年度への移行を行うと、前年度の全バナー案件は「完了済み」として保護され、原則として編集ができなくなります。</p>
+                <p className="text-[10px] text-amber-700/70 font-bold leading-relaxed">新年度への移行を行うと、前年度の全バナープロジェクトは「完了済み」として保護され、原則として編集ができなくなります。</p>
             </div>
         </div>
       </div>
 
       <div className="p-6 flex justify-end">
-        <button className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] shadow-lg active:scale-95">設定を保存</button>
+        {isSaved ? (
+          <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-[11px] shadow-lg animate-in zoom-in-95 duration-300">
+            <FileCheck size={14} /> 保存しました
+          </div>
+        ) : (
+          <button 
+            onClick={() => {
+              setIsSaved(true);
+              setTimeout(() => {
+                setIsSaved(false);
+              }, 3000);
+            }}
+            className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[11px] shadow-lg active:scale-95 hover:bg-slate-800 transition-all"
+          >
+            設定を保存
+          </button>
+        )}
       </div>
     </div>
   );

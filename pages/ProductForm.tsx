@@ -144,22 +144,6 @@ export const ProductForm: React.FC = () => {
 
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">
-                  ジャンル
-                </label>
-                <select
-                    className="w-full px-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all appearance-none cursor-pointer"
-                    value={formData.genre}
-                    onChange={e => setFormData({...formData, genre: e.target.value})}
-                >
-                    <option value="">ジャンルを選択</option>
-                    {PRODUCT_GENRES.map(g => (
-                        <option key={g} value={g}>{g}</option>
-                    ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">
                   商品管理番号
                 </label>
                 <input
@@ -169,25 +153,6 @@ export const ProductForm: React.FC = () => {
                   value={formData.product_code}
                   onChange={e => setFormData({...formData, product_code: e.target.value})}
                 />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">
-                  温度帯
-                </label>
-                <div className="relative">
-                  <Thermometer className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
-                  <select
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-0 rounded-xl focus:bg-white outline-none font-bold text-slate-700 text-sm transition-all appearance-none cursor-pointer"
-                      value={formData.temperature_range}
-                      onChange={e => setFormData({...formData, temperature_range: e.target.value as TemperatureRange})}
-                  >
-                      <option value="">選択してください</option>
-                      <option value="normal">常温</option>
-                      <option value="refrigerated">冷蔵</option>
-                      <option value="frozen">冷凍</option>
-                  </select>
-                </div>
               </div>
 
               <div className="md:col-span-2">
@@ -202,21 +167,6 @@ export const ProductForm: React.FC = () => {
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
                 />
-              </div>
-
-              <div className="md:col-span-1">
-                <label className="flex items-center gap-3 cursor-pointer group p-2.5 bg-slate-50 rounded-xl border-2 border-transparent hover:border-accent/20 transition-all h-full">
-                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.has_materials ? 'bg-accent border-accent text-white shadow-lg shadow-accent/20' : 'border-slate-300 bg-white'}`}>
-                    {formData.has_materials && <FolderCheck size={12} strokeWidth={3} />}
-                  </div>
-                  <input
-                    type="checkbox"
-                    className="hidden"
-                    checked={formData.has_materials}
-                    onChange={e => setFormData({...formData, has_materials: e.target.checked})}
-                  />
-                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-900 transition-colors">制作素材の提供あり</span>
-                </label>
               </div>
 
               <div className="md:col-span-2">

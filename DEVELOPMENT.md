@@ -26,7 +26,7 @@
 │   └── Dockerfile        # バックエンド Docker 定義
 ├── pages/                # React ページコンポーネント
 │   ├── Dashboard.tsx     # ホーム
-│   ├── ImageList.tsx     # 案件一覧
+│   ├── ImageList.tsx     # プロジェクト一覧
 │   ├── ImageDetail.tsx   # 画像詳細・チャット
 │   ├── ImageUpload.tsx   # 新規画像登録
 │   ├── ImageRevisionList.tsx  # 画像改修状況

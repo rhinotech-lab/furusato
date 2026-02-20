@@ -27,10 +27,11 @@ export const Login: React.FC = () => {
       await login(qEmail, pw);
       // ログイン後、ロールに応じてリダイレクト
       const loginInfo = JSON.parse(localStorage.getItem('furusato_last_login') || '{}');
-      const type = loginInfo.type || 'admin';
-      if (type === 'admin') navigate('/admin');
-      else if (type === 'municipality') navigate('/municipality');
-      else navigate('/business');
+      const role = loginInfo.role || 'super_admin';
+      if (role === 'super_admin' || role === 'creator') navigate('/admin');
+      else if (role === 'municipality_user') navigate('/municipality');
+      else if (role === 'business_user') navigate('/business');
+      else navigate('/admin');
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました');
     } finally {
@@ -48,10 +49,11 @@ export const Login: React.FC = () => {
 
       // ログイン後、保存されたユーザー情報からリダイレクト先を決定
       const loginInfo = JSON.parse(localStorage.getItem('furusato_last_login') || '{}');
-      const type = loginInfo.type || 'admin';
-      if (type === 'admin') navigate('/admin');
-      else if (type === 'municipality') navigate('/municipality');
-      else navigate('/business');
+      const role = loginInfo.role || 'super_admin';
+      if (role === 'super_admin' || role === 'creator') navigate('/admin');
+      else if (role === 'municipality_user') navigate('/municipality');
+      else if (role === 'business_user') navigate('/business');
+      else navigate('/admin');
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました');
     } finally {
@@ -62,20 +64,15 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-200 via-[#E8EDF4] to-blue-200/50 flex flex-col items-center justify-center p-4 font-sans">
       <div className="w-full max-w-[1000px] flex flex-col md:flex-row bg-[#F0F4F8] rounded-[3rem] shadow-[0_60px_120px_-30px_rgba(0,0,0,0.2)] overflow-hidden border border-white/40 transition-all duration-700">
-        <div className="md:w-[38%] bg-[#050505] p-10 lg:p-12 text-white flex flex-col justify-between relative overflow-hidden shrink-0">
+        <div className="md:w-[38%] bg-[#050505] p-10 lg:p-12 text-white flex flex-col justify-start relative overflow-hidden shrink-0">
           <div className="absolute top-[-20%] right-[-20%] w-[300px] h-[300px] bg-accent/20 rounded-full blur-[100px] opacity-40"></div>
-          <div className="relative z-10 space-y-12">
+          <div className="relative z-10 pt-8 lg:pt-12">
             <div className="flex flex-col animate-in slide-in-from-bottom-4 duration-700">
-                <span className="text-accent text-[8px] font-black tracking-[0.4em] mb-5 uppercase opacity-70">Local Creative Connect</span>
                 <div className="space-y-1">
                     <h1 className="text-4xl lg:text-5xl font-black leading-none tracking-tighter italic">ふるさと納税</h1>
                     <h2 className="text-3xl lg:text-4xl font-black leading-none tracking-tighter opacity-80">制作管理システム</h2>
                 </div>
-                <div className="w-10 h-[1.5px] bg-accent mt-8 rounded-full opacity-40"></div>
             </div>
-          </div>
-          <div className="relative z-10 pt-4 border-t border-white/5 opacity-20">
-             <p className="text-[8px] font-black uppercase tracking-[0.3em]">© 2025 Local Creative MGT.</p>
           </div>
         </div>
         
@@ -147,12 +144,56 @@ export const Login: React.FC = () => {
               </form>
 
               <div className="mt-8 pt-8 border-t border-slate-200">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">テストアカウント</p>
-                <div className="space-y-2 text-[10px] text-slate-600 font-bold">
-                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('admin@example.com', 'password')}>管理者: admin@example.com</p>
-                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('creator@example.com', 'password')}>制作者: creator@example.com</p>
-                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('municipality@example.com', 'password')}>自治体: municipality@example.com</p>
-                  <p className="cursor-pointer hover:text-accent transition-colors" onClick={() => quickLogin('business@example.com', 'password')}>事業者: business@example.com</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">テストアカウント（クリックでログイン）</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => quickLogin('admin@example.com', 'password')}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-black text-slate-900 truncate">管理者</p>
+                      <p className="text-[9px] text-slate-500 font-bold truncate">admin@example.com</p>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quickLogin('creator@example.com', 'password')}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-black text-slate-900 truncate">制作者</p>
+                      <p className="text-[9px] text-slate-500 font-bold truncate">creator@example.com</p>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quickLogin('municipality@example.com', 'password')}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-purple-500 shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-black text-slate-900 truncate">自治体</p>
+                      <p className="text-[9px] text-slate-500 font-bold truncate">municipality@example.com</p>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quickLogin('business@example.com', 'password')}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-amber-500 shrink-0"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-black text-slate-900 truncate">事業者</p>
+                      <p className="text-[9px] text-slate-500 font-bold truncate">business@example.com</p>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>

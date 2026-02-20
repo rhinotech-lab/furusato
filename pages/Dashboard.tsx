@@ -64,7 +64,7 @@ export const Dashboard: React.FC = () => {
     { label: '要対応', value: alertCount, icon: AlertTriangle, color: 'rose', path: `${basePath}/alerts` },
     { label: '承認待ち', value: pendingCount, icon: Clock, color: 'blue', path: `${basePath}/images?status=pending_review` },
     { label: '承認済み', value: approvedCount, icon: CheckCircle, color: 'emerald', path: `${basePath}/images?status=approved` },
-    { label: '全案件数', value: relevantImages.length, icon: FileImage, color: 'slate', path: `${basePath}/images` },
+    { label: '全プロジェクト数', value: relevantImages.length, icon: FileImage, color: 'slate', path: `${basePath}/images` },
   ];
 
   const colorMap: any = {
@@ -106,7 +106,7 @@ export const Dashboard: React.FC = () => {
                 <thead className="sticky top-0 z-10">
                     <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
                         <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">ステータス</th>
-                        <th className="px-3 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">案件 / 商品</th>
+                        <th className="px-3 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">プロジェクト / 商品</th>
                         <th className="px-3 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">事業者</th>
                         <th className="px-3 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 text-center">期限</th>
                         <th className="px-3 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 text-center">更新日</th>

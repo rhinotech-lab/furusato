@@ -155,7 +155,7 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 1001,
         image_id: 1,
         version_number: 1,
-        file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1558030006-450675393462?w=1000&q=80&auto=format&fit=crop",
         status: 'approved',
         submitted_at: "2026-02-01T15:00:00",
         created_at: "2026-02-01T15:00:00"
@@ -164,7 +164,7 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 10012,
         image_id: 1,
         version_number: 2,
-        file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1558030006-450675393462?w=1000&q=80&auto=format&fit=crop",
         status: 'rejected',
         submitted_at: "2026-02-03T12:00:00",
         created_at: "2026-02-03T12:00:00"
@@ -173,7 +173,7 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 10013,
         image_id: 1,
         version_number: 3,
-        file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1558030006-450675393462?w=1000&q=80&auto=format&fit=crop",
         status: 'pending_review',
         submitted_at: "2026-02-05T15:00:00",
         created_at: "2026-02-05T15:00:00"
@@ -191,7 +191,7 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 1004,
         image_id: 4,
         version_number: 1,
-        file_path: "https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=1000&q=80&auto=format&fit=crop",
         status: 'pending_review',
         submitted_at: "2026-02-03T15:30:00",
         created_at: "2026-02-03T15:30:00"
@@ -209,7 +209,7 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 1005,
         image_id: 5,
         version_number: 1,
-        file_path: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&q=80&auto=format&fit=crop",
         status: 'approved',
         submitted_at: "2026-03-01T16:00:00",
         created_at: "2026-03-01T16:00:00"
@@ -227,7 +227,7 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 1006,
         image_id: 6,
         version_number: 1,
-        file_path: "https://images.unsplash.com/photo-1484723088339-fe28233e562e?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1000&q=80&auto=format&fit=crop",
         status: 'pending_review',
         submitted_at: "2026-01-15T11:00:00",
         created_at: "2026-01-15T11:00:00"
@@ -245,10 +245,85 @@ const DEFAULT_IMAGES: ImageEntity[] = [
         id: 1007,
         image_id: 7,
         version_number: 1,
-        file_path: "https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=1000&q=80",
+        file_path: "https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=1000&q=80&auto=format&fit=crop",
         status: 'revising',
         submitted_at: "2026-01-20T11:00:00",
         created_at: "2026-01-20T11:00:00"
+      }
+    ]
+  },
+  {
+    id: 8,
+    product_id: 1,
+    title: "2026年3月　肉類系",
+    created_by_admin_id: 2,
+    created_at: "2026-03-05T10:00:00",
+    versions: [
+      {
+        id: 1008,
+        image_id: 8,
+        version_number: 1,
+        file_path: "https://images.unsplash.com/photo-1558030006-450675393462?w=1000&q=80&auto=format&fit=crop",
+        status: 'pending_review',
+        submitted_at: "2026-03-05T15:00:00",
+        created_at: "2026-03-05T15:00:00"
+  }
+    ]
+  },
+  // 1月野菜系
+  {
+    id: 9,
+    product_id: 1,
+    title: "2026年1月　野菜系",
+    created_by_admin_id: 2,
+    created_at: "2026-01-10T10:00:00",
+    versions: [
+      {
+        id: 1009,
+        image_id: 9,
+        version_number: 1,
+        file_path: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1000&q=80&auto=format&fit=crop",
+        status: 'approved',
+        submitted_at: "2026-01-10T10:00:00",
+        created_at: "2026-01-10T10:00:00"
+      }
+    ]
+  },
+  // 2月野菜系
+  {
+    id: 10,
+    product_id: 1,
+    title: "2026年2月　野菜系",
+    created_by_admin_id: 2,
+    created_at: "2026-02-05T10:00:00",
+    versions: [
+      {
+        id: 1010,
+        image_id: 10,
+        version_number: 1,
+        file_path: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=1000&q=80&auto=format&fit=crop",
+        status: 'approved',
+        submitted_at: "2026-02-05T10:00:00",
+        created_at: "2026-02-05T10:00:00"
+      }
+    ]
+  },
+  // 3月野菜系
+  {
+    id: 11,
+    product_id: 1,
+    title: "2026年3月　野菜系",
+    created_by_admin_id: 2,
+    created_at: "2026-03-10T10:00:00",
+    versions: [
+      {
+        id: 1011,
+        image_id: 11,
+        version_number: 1,
+        file_path: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1000&q=80&auto=format&fit=crop",
+        status: 'approved',
+        submitted_at: "2026-03-10T10:00:00",
+        created_at: "2026-03-10T10:00:00"
       }
     ]
   }
@@ -262,6 +337,46 @@ const DEFAULT_COMMENTS: Comment[] = [
 ];
 
 let comments: Comment[] = loadFromStorage('comments', DEFAULT_COMMENTS);
+
+const DEFAULT_NOTIFICATIONS: Notification[] = [
+  {
+    id: 1,
+    title: "新着メッセージ",
+    message: "「2026年2月　肉類系」の画像に新しいコメントが追加されました。",
+    is_read: false,
+    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2時間前
+  },
+  {
+    id: 2,
+    title: "ステータス変更",
+    message: "「2026年1月　肉類系」のステータスが「承認済み」に変更されました。",
+    is_read: false,
+    created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() // 5時間前
+  },
+  {
+    id: 3,
+    title: "新着コメント",
+    message: "「2026年3月　肉類系」の画像に自治体からのコメントが届きました。",
+    is_read: true,
+    created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // 1日前
+  },
+  {
+    id: 4,
+    title: "画像承認完了",
+    message: "「2026年2月　野菜系」の画像が承認されました。",
+    is_read: true,
+    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() // 2日前
+  },
+  {
+    id: 5,
+    title: "修正依頼",
+    message: "「2026年1月　魚介類系」の画像に修正依頼が届きました。",
+    is_read: false,
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3日前
+  }
+];
+
+let notifications: Notification[] = loadFromStorage('notifications', DEFAULT_NOTIFICATIONS);
 
 export const mockDb = {
   getMunicipalities: () => MUNICIPALITIES,
@@ -402,6 +517,23 @@ export const mockDb = {
     comments = comments.filter(c => c.id !== id);
     saveToStorage('comments', comments);
   },
-  getNotifications: () => [],
-  markNotificationsAsRead: () => {}
+  getNotifications: () => notifications,
+  markNotificationsAsRead: () => {
+    notifications = notifications.map(n => ({ ...n, is_read: true }));
+    saveToStorage('notifications', notifications);
+  },
+  markNotificationAsRead: (id: number) => {
+    const notification = notifications.find(n => n.id === id);
+    if (notification) {
+      notification.is_read = true;
+      saveToStorage('notifications', notifications);
+    }
+  },
+  markNotificationAsUnread: (id: number) => {
+    const notification = notifications.find(n => n.id === id);
+    if (notification) {
+      notification.is_read = false;
+      saveToStorage('notifications', notifications);
+    }
+  }
 };

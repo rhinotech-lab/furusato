@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { mockDb, MUNICIPALITIES, PORTALS, BUSINESSES, PRODUCTS } from '../services/mockDb';
+import { mockDb, MUNICIPALITIES, BUSINESSES, PRODUCTS } from '../services/mockDb';
 import { useAuth } from '../context/AuthContext';
 import { Link, useParams } from 'react-router-dom';
 import { Plus, Edit, Tag, MapPin, Clock, ChevronRight } from 'lucide-react';
@@ -106,48 +106,27 @@ export const BusinessList: React.FC = () => {
             <thead className="sticky top-0 z-20">
               <tr className="bg-white/95 backdrop-blur-sm text-slate-400 shadow-sm">
                 <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100">1. 事業者情報</th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-32">2. ポータル</th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-24">3. 品数</th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-40 text-center">4. アクティビティ</th>
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-24">2. 品数</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest border-b border-slate-100 w-40 text-center">3. アクティビティ</th>
                 <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center border-b border-slate-100 w-24">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredBusinesses.length === 0 ? (
-                  <tr><td colSpan={5} className="px-8 py-10 text-center text-slate-300 font-bold">事業者が見つかりませんでした</td></tr>
+                  <tr><td colSpan={4} className="px-8 py-10 text-center text-slate-300 font-bold">事業者が見つかりませんでした</td></tr>
               ) : filteredBusinesses.map(b => {
                 const stats = getBusinessStats(b.id);
                 return (
                   <tr key={b.id} className="hover:bg-slate-50 transition-colors group">
                     {/* 1. 事業者情報 (名前 + カテゴリ) */}
                     <td className="px-6 py-4 border-b border-slate-50/50">
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-slate-900 text-[14px] truncate">{b.name}</span>
-                        <span className="text-[10px] text-slate-400 font-bold mt-0.5">{b.category || '未設定'}</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-bold text-slate-900 text-[14px] truncate">{b.name}</span>
+                          <span className="text-[10px] text-slate-400 font-bold mt-0.5">{b.category || '未設定'}</span>
                       </div>
                     </td>
 
-                    {/* 2. 掲載ポータル (アイコン) */}
-                    <td className="px-4 py-4 border-b border-slate-50/50">
-                      <div className="flex justify-center gap-1">
-                        {PORTALS.map(p => {
-                          const isListed = b.portals?.includes(p.id);
-                          return (
-                            <div 
-                              key={p.id} 
-                              className={`w-4 h-4 rounded-sm flex items-center justify-center text-[8px] font-black transition-all ${
-                                isListed ? `${p.color} text-white shadow-sm` : 'bg-slate-50 text-slate-100'
-                              }`}
-                              title={p.full}
-                            >
-                              {p.label}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </td>
-
-                    {/* 3. 返礼品数 (総数 / 制作中) */}
+                    {/* 2. 返礼品数 (総数 / 制作中) */}
                     <td className="px-4 py-4 text-center border-b border-slate-50/50">
                       <div className="flex flex-col items-center">
                         <span className="text-[15px] font-black text-slate-900">{stats.total}</span>
@@ -157,7 +136,7 @@ export const BusinessList: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* 4. アクティビティ */}
+                    {/* 3. アクティビティ */}
                     <td className="px-6 py-4 text-center border-b border-slate-50/50">
                       <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
@@ -173,7 +152,7 @@ export const BusinessList: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* 5. 操作 */}
+                    {/* 4. 操作 */}
                     <td className="px-4 py-4 text-center border-b border-slate-50/50">
                       <Link
                         to={`${basePath}/businesses/${b.id}/edit`}

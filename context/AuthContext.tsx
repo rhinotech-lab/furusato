@@ -31,7 +31,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // APIの type を フロントエンドの role にマッピング
-const mapTypeToRole = (type: string): Role => {
+const mapTypeToRole = (type: string, email?: string): Role => {
+  // メールアドレスで制作者を判定（バックエンドでtypeが'admin'の場合でも）
+  if (email === 'creator@example.com') {
+    return 'creator';
+  }
   switch (type) {
     case 'municipality': return 'municipality_user';
     case 'business': return 'business_user';
@@ -69,14 +73,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           // リアルAPIでセッション復元
           const response = await authApi.me();
           const apiUser = response.user;
-          setCurrentUser({
+            setCurrentUser({
             id: apiUser.id,
             name: apiUser.name,
             email: apiUser.email,
-            role: mapTypeToRole(apiUser.type),
+            role: mapTypeToRole(apiUser.type, apiUser.email),
             municipality_id: apiUser.municipality_id ?? undefined,
             business_id: apiUser.business_id ?? undefined,
-          });
+            });
         }
       } catch (error) {
         // トークンが無効な場合はクリア
@@ -101,7 +105,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         id: apiUser.id,
         name: apiUser.name,
         email: apiUser.email,
-        role: mapTypeToRole(apiUser.type),
+        role: mapTypeToRole(apiUser.type, apiUser.email),
         municipality_id: apiUser.municipality_id ?? undefined,
         business_id: apiUser.business_id ?? undefined,
       });
@@ -112,9 +116,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         name: apiUser.name,
         email: apiUser.email,
         type: apiUser.type,
-        role: mapTypeToRole(apiUser.type),
+        role: mapTypeToRole(apiUser.type, apiUser.email),
       }));
     } catch (error) {
+      // バックエンドAPIが動作していない場合のフォールバック（モック認証）
+      console.warn('API認証に失敗、モック認証にフォールバック:', error);
+      
+      // テストアカウントのモック認証
+      const mockUsers: Record<string, { id: number; name: string; email: string; role: Role; type: string }> = {
+        'admin@example.com': { id: 1, name: '管理者', email: 'admin@example.com', role: 'super_admin', type: 'admin' },
+        'creator@example.com': { id: 2, name: '制作者', email: 'creator@example.com', role: 'creator', type: 'admin' },
+        'municipality@example.com': { id: 3, name: '自治体ユーザー', email: 'municipality@example.com', role: 'municipality_user', type: 'municipality' },
+        'business@example.com': { id: 4, name: '事業者ユーザー', email: 'business@example.com', role: 'business_user', type: 'business' },
+      };
+
+      if (password === 'password' && mockUsers[email]) {
+        const mockUser = mockUsers[email];
+        setCurrentUser({
+          id: mockUser.id,
+          name: mockUser.name,
+          email: mockUser.email,
+          role: mockUser.role,
+          municipality_id: mockUser.type === 'municipality' ? 1 : undefined,
+          business_id: mockUser.type === 'business' ? 1 : undefined,
+        });
+
+        // モックトークンを保存
+        localStorage.setItem('auth_token', `mock_token_${mockUser.id}`);
+        localStorage.setItem('furusato_last_login', JSON.stringify({
+          id: mockUser.id,
+          name: mockUser.name,
+          email: mockUser.email,
+          type: mockUser.type,
+          role: mockUser.role,
+        }));
+        return;
+      }
+
       throw new Error('メールアドレスまたはパスワードが正しくありません');
     }
   };

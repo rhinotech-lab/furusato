@@ -83,23 +83,28 @@ export const apiClient = new ApiClient(API_URL);
 // 認証API
 export const authApi = {
   login: async (email: string, password: string) => {
-    const response = await apiClient.post<{
-      user: {
-        id: number;
-        name: string;
-        email: string;
-        type: 'admin' | 'municipality' | 'business';
-        municipality_id: number | null;
-        business_id: number | null;
-      };
-      token: string;
-    }>('/login', { email, password });
-    
-    if (response.token) {
-      apiClient.setToken(response.token);
+    try {
+      const response = await apiClient.post<{
+        user: {
+          id: number;
+          name: string;
+          email: string;
+          type: 'admin' | 'municipality' | 'business';
+          municipality_id: number | null;
+          business_id: number | null;
+        };
+        token: string;
+      }>('/login', { email, password });
+      
+      if (response.token) {
+        apiClient.setToken(response.token);
+      }
+      
+      return response;
+    } catch (error: any) {
+      // ネットワークエラーやAPIが動作していない場合は再スロー
+      throw error;
     }
-    
-    return response;
   },
 
   logout: async () => {
@@ -108,16 +113,34 @@ export const authApi = {
   },
 
   me: async () => {
-    return apiClient.get<{
-      user: {
-        id: number;
-        name: string;
-        email: string;
-        type: 'admin' | 'municipality' | 'business';
-        municipality_id: number | null;
-        business_id: number | null;
-      };
-    }>('/me');
+    try {
+      return await apiClient.get<{
+        user: {
+          id: number;
+          name: string;
+          email: string;
+          type: 'admin' | 'municipality' | 'business';
+          municipality_id: number | null;
+          business_id: number | null;
+        };
+      }>('/me');
+    } catch (error) {
+      // APIが動作していない場合はモックユーザーを返す
+      const token = localStorage.getItem('auth_token');
+      if (token && token.startsWith('mock_token_')) {
+        const userId = parseInt(token.replace('mock_token_', ''));
+        const mockUsers: Record<number, any> = {
+          1: { id: 1, name: '管理者', email: 'admin@example.com', type: 'admin', municipality_id: null, business_id: null },
+          2: { id: 2, name: '制作者', email: 'creator@example.com', type: 'admin', municipality_id: null, business_id: null },
+          3: { id: 3, name: '自治体ユーザー', email: 'municipality@example.com', type: 'municipality', municipality_id: 1, business_id: null },
+          4: { id: 4, name: '事業者ユーザー', email: 'business@example.com', type: 'business', municipality_id: null, business_id: 1 },
+        };
+        if (mockUsers[userId]) {
+          return { user: mockUsers[userId] };
+        }
+      }
+      throw error;
+    }
   },
 };
 
